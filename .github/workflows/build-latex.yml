@@ -20,48 +20,44 @@ jobs:
       # Checks out your repository code so the workflow can access it
       uses: actions/checkout@v4
 
-    # === CORRECTED TeX LIVE SETUP ===
-    # === NEW CACHING STEP FOR TinyTeX ===
-    - name: Cache TinyTeX
-      uses: actions/cache@v4 # Use the generic caching action
+    - name: Cache TinyTeX Installation
+      # This step attempts to restore a previous TinyTeX installation from cache.
+      # It will run before the 'Set up TinyTeX' step.
+      uses: actions/cache@v4
       with:
-        path: ~/.TinyTeX # The default installation path for TinyTeX
-        key: ${{ runner.os }}-tinytex-${{ hashFiles('.github/workflows/build-latex.yml') }} # Unique cache key
-        # You could also use a version or date in the key, e.g.:
-        # key: ${{ runner.os }}-tinytex-2025-05-31
-        # This key will change if you modify the workflow file, invalidating the cache
-        # and forcing a fresh install when needed.
-    # === END NEW CACHING STEP ===
+        path: ~/.TinyTeX # The default installation path for TinyTeX on Ubuntu
+        # The cache key will now change ONLY if latex_packages.txt changes,
+        # forcing a fresh install only when your LaTeX dependencies change.
+        key: ${{ runner.os }}-tinytex-${{ hashFiles(env.TEX_ROOT}}/latex_packages.txt') }}
+        restore-keys: | # Allows restoring from a slightly older, but compatible, cache
+          ${{ runner.os }}-tinytex-
 
-    - name: Set up TinyTeX # Now this step will either restore from cache or install fresh
+    - name: Set up TinyTeX
+      # This action will detect if TinyTeX is already present (from cache)
+      # and use the cached version instead of installing from scratch.
       uses: r-lib/actions/setup-tinytex@v2
-      # Remove the 'with: cache: true' line that caused the warning. No 'with' input needed here.
+      # No 'with:' inputs needed here, as caching is handled by actions/cache.
 
     - name: Install LaTeX Packages
-      # Use tlmgr (TeX Live Manager) to install specific packages
-      # This step must come AFTER 'Set up TinyTeX'
+      # This step runs AFTER TinyTeX is set up (or restored from cache).
+      # It will only install packages that are truly missing.
       run: |
         echo "Updating tlmgr itself..."
-        tlmgr update --self || echo "tlmgr self-update failed, continuing anyway..." # Update tlmgr itself first
+        # We use 'true' to ensure this step doesn't fail the whole job if self-update has a minor hiccup.
+        tlmgr update --self || true
 
-        echo "Installing core LaTeX collections and latexmk..."
-        # Install latexmk separately as it's a tool, not necessarily part of collections
-        tlmgr install latexmk
-
-        # These collections should contain amsmath, amssymb, amsthm, and many other common packages
-        tlmgr install collection-fontsrecommended
-        tlmgr install collection-latexrecommended
-        # If your document specifically requires other packages not covered by these collections,
-        # list them individually here:
-        # tlmgr install graphicx
-        # tlmmgr install hyperref
-        # tlmgr install caption
-        # tlmgr install geometry
-        # tlmgr install tikz
-        
-        # Optional: You can run a full update of all installed packages, but it can be slow
-        # echo "Updating all installed LaTeX packages (optional, can be slow)..."
-        # tlmgr update --all || echo "tlmgr update --all failed, continuing anyway..."
+        echo "Installing LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt..."
+        # Loop through each package in latex_packages.txt and install it.
+        # This is more robust and ensures only what's listed is installed.
+        while IFS= read -r package; do
+          if [ -n "$package" ]; then # Ensure line is not empty
+            echo "Attempting to install: $package"
+            # Use 'tlmgr install --reinstall-forcibly-removed' to ensure packages are truly there
+            # even if a previous clean-up or partial install somehow removed them.
+            # Adding || true to prevent individual package install failures from stopping the whole step.
+            tlmgr install "$package" || true
+          fi
+        done < ${{ env.TEX_ROOT }}/latex_packages.txt
         
         echo "LaTeX package installation complete."
 
@@ -115,22 +111,27 @@ jobs:
         bundler-cache: true # runs 'bundle install' and caches gems
         cache-version: 1 # Increment this number if you change Gemfile.lock
 
+    - name: List contents of Jekyll directory
+      # This will list all files and directories recursively within the docs/ folder.
+      # This helps verify if Gemfile.lock is truly there and at the expected path.
+      run: ls -lR
+      working-directory: ${{ env.JEKYLL_ROOT }} # Execute 'ls' from inside the 'docs/' directory
+
     - name: Diagnose Ruby/Jekyll Setup (Optional, for debugging)
       run: |
         echo "Current directory: $(pwd)"
-        echo "Contents of Gemfile.lock in docs/: $(ls docs/Gemfile.lock || echo 'Gemfile.lock not found')"
+        # Keep this for now, it's a direct check
+        echo "Contents of Gemfile.lock in docs/: $(ls Gemfile.lock || echo 'Gemfile.lock not found')" # Removed 'docs/' as working-directory is docs/
         echo "Bundler version: $(bundle --version)"
         echo "Jekyll executable location: $(bundle exec which jekyll || echo 'Jekyll executable not found via bundle exec')"
         echo "PATH: $PATH"
-      # This step should run from the docs directory to correctly check bundle context
       working-directory: ${{ env.JEKYLL_ROOT }}
-
 
     - name: Build Jekyll site
       run: |
         echo "Attempting to build Jekyll site..."
-        bundle exec jekyll build --trace # --trace for debugging if needed
-      working-directory: ${{ env.JEKYLL_ROOT }} # Ensure this is always set for Jekyll commands
+        bundle exec jekyll build --trace
+      working-directory: ${{ env.JEKYLL_ROOT }}
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4

@@ -1,0 +1,13 @@
+latexmk
+collection-fontsrecommended
+collection-latexrecommended
+amsmath
+amssymb
+amsthm
+# Add any other specific packages your LaTeX source uses here, each on a new line
+# graphicx
+# hyperref
+# caption
+# geometry
+# tikz
+# inputenc # (Usually part of collection-latexrecommended, but common)
