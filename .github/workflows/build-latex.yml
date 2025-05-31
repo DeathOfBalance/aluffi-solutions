@@ -35,9 +35,13 @@ jobs:
             amsmath
             amssymb
             amsthm
-            mathtools
+            # mathtools
             latexmk
           cache-version: 1
+
+             - name: Ensure extra LaTeX packages are installed
+        run: |
+          tlmgr install mathtools bm
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
