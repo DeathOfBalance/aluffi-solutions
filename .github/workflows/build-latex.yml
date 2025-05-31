@@ -30,6 +30,12 @@ jobs:
         key: ${{ runner.os }}-latex-packages-v4
         restore-keys: |
           ${{ runner.os }}-latex-packages-
+
+
+    - name: Install lmodern via apt-get
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends fonts-lmodern
     
     - name: Install TeX Live (minimal)
       run: |
@@ -44,8 +50,7 @@ jobs:
             texlive-latex-recommended \
             texlive-fonts-recommended \
             texlive-latex-extra \
-            texlive-fonts-extra \
-            texlive-lmodern  # Add this line for lmodern package
+            texlive-fonts-extra
           # Mark as installed for caching
           mkdir -p ~/texlive-cache
           touch ~/texlive-cache/.installed
