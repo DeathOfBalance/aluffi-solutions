@@ -34,7 +34,8 @@ jobs:
             collection-fontsrecommended \
             collection-latexrecommended \
             latexmk \
-            amsmath amssymb amsthm mathtools bm
+            mathtools
+
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
