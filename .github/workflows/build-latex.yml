@@ -37,7 +37,15 @@ jobs:
             collection-fontsrecommended \
             collection-latexrecommended \
             latexmk \
-            mathtools
+            mathtools \
+            amsmath \
+            amssymb \
+            amsthm \
+            graphicx \
+            inputenc \
+            tikz \
+            enumitem # <--- ADDED enumitem here
+
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
         run: |
@@ -45,10 +53,12 @@ jobs:
           latexmk -pdf -interaction=nonstopmode -outdir=build main.tex
           mv build/main.pdf ../generated-pdfs/${{ env.PDF_OUTPUT_NAME }}
           latexmk -c -outdir=build main.tex
+
       - name: Copy generated PDF to Jekyll assets
         run: |
           mkdir -p ${{ env.JEKYLL_ROOT }}/assets/solutions
           cp generated-pdfs/${{ env.PDF_OUTPUT_NAME }} ${{ env.JEKYLL_ROOT }}/assets/solutions/
+
       - name: Setup Ruby for Jekyll
         uses: ruby/setup-ruby@v1
         with:
