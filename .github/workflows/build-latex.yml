@@ -1,4 +1,4 @@
-# .github/workflows/build-latex.yml (Revised)
+# .github/workflows/build-latex.yml (Revised for Caching)
 
 name: Build LaTeX Solutions and Publish
 
@@ -13,112 +13,110 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TEX_ROOT: tex-source # Adjust this to your main solutions directory
-      JEKYLL_ROOT: docs      # The folder where your Jekyll site lives
+      JEKYLL_ROOT: docs     # The folder where your Jekyll site lives
 
     steps:
     - name: Checkout repository
-      # Checks out your repository code so the workflow can access it
       uses: actions/checkout@v4
 
-       # === SIMPLIFIED TINYTEX SETUP WITH CACHING ===
-    - name: Set up TinyTeX with Caching
-      # Use the official action with its built-in 'cache: true' option.
+    # === MODIFIED TINYTEX SETUP WITH EXPLICIT PACKAGE CACHING ===
+    - name: Set up TinyTeX and Cache Key Packages
       uses: r-lib/actions/setup-tinytex@v2
       with:
-        cache: true # <--- This is the key for simple caching!
-        # Optionally, you can add a 'cache-version' here.
-        # Increment 'cache-version' (e.g., from 1 to 2) if you make significant
-        # changes to your required LaTeX packages and want to force a fresh install.
-        # cache-version: 1
-    # === END SIMPLIFIED TINYTEX SETUP ===
+        # 'cache: true' is the default for v2. Explicitly stating it is fine.
+        # If the "Unexpected input(s) 'cache'" warning truly comes from this line,
+        # ensure no typos/invisible characters, or try removing this line.
+        cache: true
+        # Add your largest/most stable packages/collections here.
+        # This helps ensure they are part of the cache key used by setup-tinytex.
+        tlmgr-packages: |
+          collection-fontsrecommended
+          collection-latexrecommended
+          # Add any other frequently used, large, or foundational packages/collections
+          # e.g., scheme-full (if you need a very comprehensive setup)
+          # Or specific packages like:
+          # amsmath
+          # graphicx
+        # Increment 'cache-version' if you make significant changes to 'tlmgr-packages'
+        # or if you suspect the cache is stale and want to force a refresh.
+        cache-version: 1 
+    # === END MODIFIED TINYTEX SETUP ===
 
-    - name: Install LaTeX Packages
-      # This step should automatically be very fast if the TinyTeX cache was hit.
+    - name: Install Additional LaTeX Packages from File
+      # This step installs any remaining packages listed in latex_packages.txt.
+      # tlmgr will skip packages already installed by the 'setup-tinytex' step.
       run: |
-        echo "Updating tlmgr itself..."
-        tlmgr update --self || true # Always good to keep tlmgr updated
+        echo "Updating tlmgr itself (optional, often not needed with cached TinyTeX)..."
+        # tlmgr update --self || true # Consider if this is needed; can be slow
 
-        echo "Installing LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt..."
-        # This loop will ensure all packages listed are present.
-        # If the cache works, most/all of these should already be installed,
-        # making this part very quick.
-        while IFS= read -r package; do
-          if [ -n "$package" ]; then
-            echo "Attempting to install: $package"
-            tlmgr install "$package" || true # Continue even if one fails
-          fi
-        done < ${{ env.TEX_ROOT }}/latex_packages.txt
+        echo "Ensuring all LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt are present..."
+        PACKAGE_FILE="${{ env.TEX_ROOT }}/latex_packages.txt"
         
-        echo "LaTeX package installation complete."
+        if [ -s "$PACKAGE_FILE" ]; then
+          echo "Packages to install/verify from $PACKAGE_FILE:"
+          # Print non-empty, non-comment lines from the package file
+          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" || echo "No non-comment packages in file."
+
+          # Read non-empty, non-comment lines, and pass to tlmgr install
+          # The '|| true' allows the workflow to continue if a package fails, is a meta-package, or is already installed.
+          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" | xargs -r -n 1 -I {} sh -c 'echo "Attempting to install/verify: {}"; tlmgr install "{}" --no-depends || tlmgr install "{}" || echo "Notice: Could not install {} or it was already present/a meta-package."'
+          # The '--no-depends' first attempt can speed things up if dependencies are already met.
+          # The second attempt 'tlmgr install "{}"' is a fallback.
+        else
+          echo "No packages listed in $PACKAGE_FILE or file is empty/not found."
+        fi
+        echo "LaTeX package installation process complete."
 
     - name: Create directory for generated PDFs
-      # Creates the folder where the compiled PDF will temporarily reside
       run: mkdir -p ${{ github.workspace }}/generated-pdfs
 
     - name: Compile Main LaTeX Document to PDF
-      # IMPORTANT: This step will now execute from within the TEX_ROOT directory.
-      working-directory: ${{ env.TEX_ROOT }} # <--- ADD THIS LINE HERE
+      working-directory: ${{ env.TEX_ROOT }}
       run: |
-        # In this step, 'main.tex' is now relative to the working-directory (tex-source/).
         MAIN_TEX_FILE="main.tex"
-        
-        # Define a temporary output directory *relative to the working-directory*
-        # for latexmk's intermediate and final files.
         TEMP_LATEX_OUTPUT_DIR="latex_build_temp"
         mkdir -p "$TEMP_LATEX_OUTPUT_DIR"
 
-        # The final target directory for the PDF, relative to the *repository root*
         FINAL_PDF_OUTPUT_DIR="${{ github.workspace }}/generated-pdfs"
         OUTPUT_PDF_NAME="aluffi-solutions-book.pdf"
 
         echo "Compiling $MAIN_TEX_FILE from ${{ env.TEX_ROOT }} and outputting to $FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME..."
         
-        # Compile using latexmk, outputting auxiliary files and main.pdf to TEMP_LATEX_OUTPUT_DIR
+        # Compile using latexmk
         latexmk -pdf -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
 
-        # Ensure the final output directory exists for the move
         mkdir -p "$FINAL_PDF_OUTPUT_DIR"
-        
-        # Move the compiled PDF from the temporary location to the final desired location
         mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
 
-        # Clean up auxiliary files from the temporary output directory
         latexmk -c -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
-        rm -rf "$TEMP_LATEX_OUTPUT_DIR" # Remove the temporary directory itself
+        rm -rf "$TEMP_LATEX_OUTPUT_DIR"
 
     - name: Copy generated PDFs into Jekyll site assets
       run: |
         JEKYLL_ASSETS_DIR="${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/"
         mkdir -p "$JEKYLL_ASSETS_DIR"
-        # Copy the single generated PDF
         cp ${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf "$JEKYLL_ASSETS_DIR"
-
 
     - name: Setup Ruby for Jekyll
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.4.4' # Use a recent stable Ruby version, e.g., '3.2' or '3.3'
-        bundler-cache: true # runs 'bundle install' and caches gems
-        cache-version: 1 # Increment this number if you change Gemfile.lock
+        ruby-version: '3.1' # Specify a Ruby version compatible with your Jekyll setup
+        bundler-cache: true 
+        cache-version: 1    # Increment if Gemfile.lock changes
 
-    - name: List contents of Jekyll directory # Re-adding for re-confirmation
+    - name: List contents of Jekyll directory
       run: ls -lR
       working-directory: ${{ env.JEKYLL_ROOT }}
 
-    - name: Install Ruby Gems (explicitly ensure 'jekyll' executable is found)
-      # This step explicitly runs 'bundle install' to ensure all gems are
-      # correctly installed and available for 'bundle exec'.
-      # 'bundle config path vendor/bundle' installs gems into a local directory,
-      # which can sometimes be more robust for CI environments.
+    - name: Install Ruby Gems
       run: |
         bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3 # --jobs for faster install, --retry for robustness
+        bundle install --jobs 4 --retry 3
       working-directory: ${{ env.JEKYLL_ROOT }}
 
-    - name: Diagnose Ruby/Jekyll Setup (Optional, for debugging)
+    - name: Diagnose Ruby/Jekyll Setup (Optional)
       run: |
         echo "Current directory: $(pwd)"
-        # CORRECTED `ls` command for Gemfile.lock within `docs/` working directory
         echo "Contents of Gemfile.lock: $(ls Gemfile.lock || echo 'Gemfile.lock not found')"
         echo "Bundler version: $(bundle --version)"
         echo "Jekyll executable location: $(bundle exec which jekyll || echo 'Jekyll executable not found via bundle exec')"
@@ -128,7 +126,7 @@ jobs:
     - name: Build Jekyll site
       run: |
         echo "Attempting to build Jekyll site..."
-        bundle exec jekyll build --trace # This should now find jekyll
+        bundle exec jekyll build --trace
       working-directory: ${{ env.JEKYLL_ROOT }}
 
     - name: Deploy to GitHub Pages
@@ -136,5 +134,5 @@ jobs:
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site # Publish Jekyll's output directory
-        # cname: your-custom-domain.com # Optional: if you have a custom domain
+        publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site
+        # cname: your-custom-domain.com # Optional
