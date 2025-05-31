@@ -24,6 +24,10 @@ jobs:
     - name: Set up TinyTeX
       # This action installs TinyTeX. We no longer pass 'packages' here.
       uses: r-lib/actions/setup-tinytex@v2
+      with:
+        cache: true # <--- ADD THIS LINE TO ENABLE CACHING
+        # Optionally, you can specify a version for the cache key, e.g.:
+        # cache-version: 1
 
     - name: Install LaTeX Packages
       # Use tlmgr (TeX Live Manager) to install specific packages
@@ -99,7 +103,7 @@ jobs:
     - name: Setup Ruby for Jekyll
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.x' # Use a recent stable Ruby version, e.g., '3.2' or '3.3'
+        ruby-version: '3.4.4' # Use a recent stable Ruby version, e.g., '3.2' or '3.3'
         bundler-cache: true # runs 'bundle install' and caches gems
         cache-version: 1 # Increment this number if you change Gemfile.lock
 
