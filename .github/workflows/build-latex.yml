@@ -51,16 +51,14 @@ jobs:
       # STEP 3: Conditionally install TinyTeX and LaTeX packages
       # This entire block only runs if the cache was NOT hit.
       - name: Install TinyTeX and LaTeX Packages (on cache miss)
-        # Only run this step if the previous cache restore was NOT a hit
         if: steps.tinytex-cache-restore.outputs.cache-hit != 'true'
         run: |
           echo "Cache miss detected. Installing TinyTeX and packages from scratch."
-          # Install base TinyTeX
           curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
 
-          # Add TinyTeX to PATH for this run
+          # Add TinyTeX to PATH for this run (CORRECTED LINE BELOW)
           export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
-          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:' '[:lower:]')" >> $GITHUB_PATH
+          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')" >> $GITHUB_PATH # CORRECTED LINE BELOW
 
           echo "Updating tlmgr itself..."
           tlmgr update --self || true
@@ -73,18 +71,16 @@ jobs:
             mathtools
           echo "LaTeX package installation complete."
 
-      # STEP 4: (Optional, runs on cache hit) Ensure TinyTeX is in PATH and packages are updated
       - name: Configure TinyTeX (on cache hit)
         if: steps.tinytex-cache-restore.outputs.cache-hit == 'true'
         run: |
           echo "Cache hit detected. Ensuring TinyTeX is configured."
-          # Add TinyTeX to PATH for this run (necessary after cache restore)
+          # Add TinyTeX to PATH for this run (CORRECTED LINE BELOW)
           export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
-          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:' '[:lower:]')" >> $GITHUB_PATH
+          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')" >> $GITHUB_PATH # CORRECTED LINE BELOW
 
           echo "Updating tlmgr itself..."
           tlmgr update --self || true
-          # Re-running tlmgr install on a hit will be very fast as packages are already present.
           echo "Verifying specified LaTeX packages (should be very fast)..."
           tlmgr install \
             collection-fontsrecommended \
@@ -149,4 +145,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ env.JEKYLL_ROOT }}/_site
-          #test
