@@ -108,17 +108,25 @@ jobs:
         bundler-cache: true # runs 'bundle install' and caches gems
         cache-version: 1 # Increment this number if you change Gemfile.lock
 
-    - name: List contents of Jekyll directory
-      # This will list all files and directories recursively within the docs/ folder.
-      # This helps verify if Gemfile.lock is truly there and at the expected path.
+    - name: List contents of Jekyll directory # Re-adding for re-confirmation
       run: ls -lR
-      working-directory: ${{ env.JEKYLL_ROOT }} # Execute 'ls' from inside the 'docs/' directory
+      working-directory: ${{ env.JEKYLL_ROOT }}
+
+    - name: Install Ruby Gems (explicitly ensure 'jekyll' executable is found)
+      # This step explicitly runs 'bundle install' to ensure all gems are
+      # correctly installed and available for 'bundle exec'.
+      # 'bundle config path vendor/bundle' installs gems into a local directory,
+      # which can sometimes be more robust for CI environments.
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3 # --jobs for faster install, --retry for robustness
+      working-directory: ${{ env.JEKYLL_ROOT }}
 
     - name: Diagnose Ruby/Jekyll Setup (Optional, for debugging)
       run: |
         echo "Current directory: $(pwd)"
-        # Keep this for now, it's a direct check
-        echo "Contents of Gemfile.lock in docs/: $(ls Gemfile.lock || echo 'Gemfile.lock not found')" # Removed 'docs/' as working-directory is docs/
+        # CORRECTED `ls` command for Gemfile.lock within `docs/` working directory
+        echo "Contents of Gemfile.lock: $(ls Gemfile.lock || echo 'Gemfile.lock not found')"
         echo "Bundler version: $(bundle --version)"
         echo "Jekyll executable location: $(bundle exec which jekyll || echo 'Jekyll executable not found via bundle exec')"
         echo "PATH: $PATH"
@@ -127,7 +135,7 @@ jobs:
     - name: Build Jekyll site
       run: |
         echo "Attempting to build Jekyll site..."
-        bundle exec jekyll build --trace
+        bundle exec jekyll build --trace # This should now find jekyll
       working-directory: ${{ env.JEKYLL_ROOT }}
 
     - name: Deploy to GitHub Pages
@@ -136,4 +144,4 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site # Publish Jekyll's output directory
-        cname: your-custom-domain.com # Optional: if you have a custom domain
+        # cname: your-custom-domain.com # Optional: if you have a custom domain
