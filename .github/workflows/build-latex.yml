@@ -26,19 +26,23 @@ jobs:
     - name: Cache LaTeX packages
       uses: actions/cache@v4
       with:
-        path: /var/cache/apt
-        key: ${{ runner.os }}-latex-packages-v2
+        path: ~/texlive-cache
+        key: ${{ runner.os }}-latex-packages-v3
         restore-keys: |
           ${{ runner.os }}-latex-packages-
     
     - name: Install TeX Live (minimal)
       run: |
-        # Check if LaTeX is already installed
-        if ! command -v pdflatex &> /dev/null; then
-          sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+        # Check if cached LaTeX installation exists
+        if [ -f "$HOME/texlive-cache/.installed" ]; then
+          echo "LaTeX already cached, skipping installation"
         else
-          echo "LaTeX already installed, skipping installation"
+          echo "Installing LaTeX packages..."
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+          # Mark as installed for caching
+          mkdir -p ~/texlive-cache
+          touch ~/texlive-cache/.installed
         fi
     
 
@@ -48,6 +52,7 @@ jobs:
       with:
         ruby-version: '3.1'
         bundler-cache: true
+        cache-version: 1
     
     - name: Create Gemfile if it doesn't exist
       run: |
@@ -61,7 +66,14 @@ jobs:
         fi
     
     - name: Install Jekyll dependencies
-      run: bundle install
+      run: |
+        # Check if gems are already installed
+        if ! bundle check &> /dev/null; then
+          echo "Installing Jekyll dependencies..."
+          bundle install
+        else
+          echo "Jekyll dependencies already satisfied"
+        fi
     
     - name: Build PDF from LaTeX
       run: |
