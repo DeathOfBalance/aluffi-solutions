@@ -1,0 +1,78 @@
+% main.tex
+% This is the master document for the entire solutions book.
+
+\documentclass[a4paper,12pt]{book} % Using 'book' class for chapters
+                                  % Use 'article' if you don't want formal chapters
+
+% --- Preamble: Global Settings and Packages (as discussed previously) ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+\usepackage{graphicx}
+\graphicspath{{assets/}} % Path to global image assets
+
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=green,
+    pdftitle={Comprehensive Solutions to [Textbook Name]},
+    pdfauthor={Your Name},
+    pdfsubject={Mathematics Solutions},
+    pdfkeywords={Math, Solutions, Textbook, LaTeX}
+]{hyperref}
+
+% Custom theorem/solution environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newenvironment{solution}{\textbf{Solution:}\quad}{\hfill$\square$\par\vspace{1ex}}
+
+% --- Document Information ---
+\title{Solutions for Selected Problems from Aluffi's \textit{Algebra: Chapter 0}} % Use \textit{} for book title
+\author{}
+\date{\today}
+
+% --- Begin Document ---
+\begin{document}
+
+% Title page
+\maketitle
+
+% Table of Contents
+\frontmatter % Command for 'book' class to switch to Roman numbering for front matter
+\tableofcontents
+\mainmatter % Command for 'book' class to switch back to Arabic numbering for main content
+
+% --- Include Chapters and their Sections ---
+
+% Chapter 1
+\chapter{Chapter 1: Fundamentals of Algebra} % This defines the chapter title and number
+% Now, input each section's solutions within this chapter
+\input{chapter-1/section-1-1.tex}
+% \input{chapter-1/section-1-2.tex}
+% \input{chapter-1/section-1-3.tex}
+
+% Chapter 2
+\chapter{Chapter 2: Functions and Graphs} % Next chapter
+% \input{chapter-2/section-2-1.tex}
+% \input{chapter-2/section-2-2.tex}
+% ... and so on for all sections in Chapter 2
+
+% Add more chapters as needed
+% \chapter{Chapter 3: Calculus I}
+% \input{chapter-3/section-3-1.tex}
+% \input{chapter-3/section-3-2.tex}
+
+% --- End Document ---
+\end{document}

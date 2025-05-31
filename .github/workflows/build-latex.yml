@@ -1,0 +1,80 @@
+# .github/workflows/build-latex.yml (Revised)
+
+name: Build LaTeX Solutions and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      TEX_ROOT: tex-source # Adjust this to your main solutions directory
+      JEKYLL_ROOT: docs      # The folder where your Jekyll site lives
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up TeX Live
+      uses: r-lib/actions/setup-tinytex@v2
+      with:
+        packages: >
+          latexmk
+          collection-fontsrecommended
+          collection-latexrecommended
+          amsmath
+          amssymb
+          amsthm
+          # Add any other LaTeX packages you use here
+
+    - name: Create directory for generated PDFs
+      run: mkdir -p ${{ github.workspace }}/generated-pdfs
+
+    - name: Compile LaTeX files to PDF
+      run: |
+        find ${{ env.TEX_ROOT }} -name "*.tex" | while read file; do
+          filename=$(basename "$file" .tex)
+          dir_path=$(dirname "$file")
+          # Replace slashes in dir_path with underscores for a flatter PDF name
+          # e.g., textbook-name/chapter-1/problem.tex -> textbook-name_chapter-1_problem.pdf
+          relative_dir=${dir_path#${TEX_ROOT}/} # Remove TEX_ROOT prefix
+          safe_dir_name=${relative_dir//\//_} # Replace slashes with underscores
+
+          output_pdf_name="${safe_dir_name:+"$safe_dir_name_"}${filename}.pdf" # Add underscore if safe_dir_name is not empty
+          if [ "${safe_dir_name}" = "" ]; then
+            output_pdf_name="${filename}.pdf"
+          fi
+
+          echo "Compiling $file to ${output_pdf_name}..."
+          latexmk -pdf -outdir=${{ github.workspace }}/generated-pdfs "$file"
+          mv ${{ github.workspace }}/generated-pdfs/"$filename".pdf ${{ github.workspace }}/generated-pdfs/"$output_pdf_name"
+          latexmk -c "$file" # Clean up auxiliary files
+        done
+
+    - name: Copy generated PDFs into Jekyll site assets
+      run: |
+        mkdir -p ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/
+        cp ${{ github.workspace }}/generated-pdfs/*.pdf ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/
+
+    - name: Setup Ruby for Jekyll
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.x' # Use a recent stable Ruby version, e.g., '3.2' or '3.3'
+        bundler-cache: true # runs 'bundle install' and caches gems
+        cache-version: 1 # Increment this number if you change Gemfile.lock
+
+    - name: Build Jekyll site
+      run: |
+        cd ${{ env.JEKYLL_ROOT }}
+        bundle exec jekyll build --trace # --trace for debugging if needed
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site # Publish Jekyll's output directory
+        cname: your-custom-domain.com # Optional: if you have a custom domain
