@@ -55,6 +55,7 @@ jobs:
           cat > Gemfile << EOF
         source "https://rubygems.org"
         gem "jekyll", "~> 4.3"
+        gem "minima", "~> 2.5"
         gem "webrick", "~> 1.7"
         EOF
         fi
@@ -99,7 +100,6 @@ jobs:
         
         markdown: kramdown
         highlighter: rouge
-        theme: minima
         
         plugins:
           - jekyll-feed
