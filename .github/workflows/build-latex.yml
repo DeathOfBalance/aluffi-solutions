@@ -20,33 +20,30 @@ jobs:
       # Checks out your repository code so the workflow can access it
       uses: actions/checkout@v4
 
-    # === MISSING PART FILLED IN HERE ===
-    - name: Set up TeX Live
-      # This action installs TinyTeX, a lightweight TeX Live distribution,
-      # and makes tools like latexmk available in the environment.
+    # === CORRECTED TeX LIVE SETUP ===
+    - name: Set up TinyTeX
+      # This action installs TinyTeX. We no longer pass 'packages' here.
       uses: r-lib/actions/setup-tinytex@v2
-      with:
-        # List the LaTeX packages/collections you need here.
-        # latexmk is essential for automated compilation.
-        # collection-fontsrecommended, collection-latexrecommended provide common fonts and LaTeX packages.
-        # amsmath, amssymb, amsthm are crucial for math documents.
-        # IMPORTANT: Add any other specific LaTeX packages your document uses.
-        # For example, if you use `\usepackage{graphicx}`, you might need `graphicx`.
-        # However, many common packages are part of `collection-latexrecommended`.
-        packages: >
-          latexmk
-          collection-fontsrecommended
-          collection-latexrecommended
-          amsmath
-          amssymb
-          amsthm
-          # Add other specific packages your .tex source requires, e.g.:
-          # graphicx
-          # hyperref
-          # caption
-          # geometry
-          # tikz
-    # === END OF MISSING PART ===
+
+    - name: Install LaTeX Packages
+      # Use tlmgr (TeX Live Manager) to install specific packages
+      # This step must come AFTER 'Set up TinyTeX'
+      run: |
+        tlmgr install latexmk
+        tlmgr install collection-fontsrecommended
+        tlmgr install collection-latexrecommended
+        tlmgr install amsmath
+        tlmgr install amssymb
+        tlmgr install amsthm
+        # Add any other specific packages your LaTeX source uses here, for example:
+        # tlmgr install graphicx
+        # tlmgr install hyperref
+        # tlmgr install caption
+        # tlmgr install geometry
+        # tlmgr install tikz
+        # IMPORTANT: Run 'tlmgr update --all' occasionally if you have issues,
+        # but typically installing specific packages is enough for CI/CD.
+    # === END OF CORRECTED TeX LIVE SETUP ===
 
     - name: Create directory for generated PDFs
       # Creates the folder where the compiled PDF will temporarily reside
