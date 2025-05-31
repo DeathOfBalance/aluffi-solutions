@@ -22,36 +22,41 @@ jobs:
 
     - name: Cache TinyTeX Installation
       uses: actions/cache@v4
+      id: tinytex-cache # <--- ADD THIS ID
       with:
         path: ~/.TinyTeX
-        # CORRECTED LINE BELOW:
         key: ${{ runner.os }}-tinytex-${{ hashFiles('${{ env.TEX_ROOT}}/latex_packages.txt') }}
         restore-keys: |
           ${{ runner.os }}-tinytex-
 
+    - name: Check TinyTeX Cache Status (for debugging)
+      # This step will tell us if the cache was hit or missed, and show the key.
+      run: |
+        echo "Cache Hit: ${{ steps.tinytex-cache.outputs.cache-hit }}"
+        if [ "${{ steps.tinytex-cache.outputs.cache-hit }}" = "true" ]; then
+          echo "TinyTeX cache restored successfully! Subsequent 'Install LaTeX Packages' should be fast."
+        else
+          echo "TinyTeX cache MISSED. Performing full installation (or re-installation)."
+        fi
+        echo "Calculated Cache Key: ${{ runner.os }}-tinytex-${{ hashFiles('${{ env.TEX_ROOT}}/latex_packages.txt') }}"
+        echo "Content of latex_packages.txt for hashing:"
+        cat ${{ env.TEX_ROOT}}/latex_packages.txt || echo "ERROR: latex_packages.txt not found at ${{ env.TEX_ROOT}}/latex_packages.txt for 'cat' command!"
+        echo "Listing file: "
+        ls -l ${{ env.TEX_ROOT}}/latex_packages.txt || echo "ERROR: ls failed for ${{ env.TEX_ROOT}}/latex_packages.txt"
+        echo "--- END Cache Status Check ---"
+
     - name: Set up TinyTeX
-      # This action will detect if TinyTeX is already present (from cache)
-      # and use the cached version instead of installing from scratch.
       uses: r-lib/actions/setup-tinytex@v2
-      # No 'with:' inputs needed here, as caching is handled by actions/cache.
 
     - name: Install LaTeX Packages
-      # This step runs AFTER TinyTeX is set up (or restored from cache).
-      # It will only install packages that are truly missing.
       run: |
         echo "Updating tlmgr itself..."
-        # We use 'true' to ensure this step doesn't fail the whole job if self-update has a minor hiccup.
         tlmgr update --self || true
 
         echo "Installing LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt..."
-        # Loop through each package in latex_packages.txt and install it.
-        # This is more robust and ensures only what's listed is installed.
         while IFS= read -r package; do
-          if [ -n "$package" ]; then # Ensure line is not empty
+          if [ -n "$package" ]; then
             echo "Attempting to install: $package"
-            # Use 'tlmgr install --reinstall-forcibly-removed' to ensure packages are truly there
-            # even if a previous clean-up or partial install somehow removed them.
-            # Adding || true to prevent individual package install failures from stopping the whole step.
             tlmgr install "$package" || true
           fi
         done < ${{ env.TEX_ROOT }}/latex_packages.txt
