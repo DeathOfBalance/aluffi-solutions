@@ -7,7 +7,7 @@ title: Home
 
 This site contains my solutions to Aluffi's Algebra: Chapter 0.
 
-**[Download the full Aluffi Solutions PDF here!](/solutions/aluffi-solutions-book.pdf)**
+**[Download the full Aluffi Solutions PDF here!](/aluffi-solutions/assets/solutions/aluffi-solutions-book.pdf)**
 
 ---
 
