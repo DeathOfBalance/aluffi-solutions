@@ -58,16 +58,35 @@ jobs:
       run: mkdir -p ${{ github.workspace }}/generated-pdfs
 
     - name: Compile Main LaTeX Document to PDF
+      # IMPORTANT: This step will now execute from within the TEX_ROOT directory.
+      working-directory: ${{ env.TEX_ROOT }} # <--- ADD THIS LINE HERE
       run: |
-        # We only compile main.tex, which includes all other sections
-        MAIN_TEX_FILE="${{ env.TEX_ROOT }}/main.tex"
-        OUTPUT_DIR="${{ github.workspace }}/generated-pdfs"
-        OUTPUT_PDF_NAME="aluffi-solutions-book.pdf" # Choose a meaningful name for your complete book PDF
+        # In this step, 'main.tex' is now relative to the working-directory (tex-source/).
+        MAIN_TEX_FILE="main.tex"
+        
+        # Define a temporary output directory *relative to the working-directory*
+        # for latexmk's intermediate and final files.
+        TEMP_LATEX_OUTPUT_DIR="latex_build_temp"
+        mkdir -p "$TEMP_LATEX_OUTPUT_DIR"
 
-        echo "Compiling $MAIN_TEX_FILE to $OUTPUT_DIR/$OUTPUT_PDF_NAME..."
-        latexmk -pdf -outdir="$OUTPUT_DIR" "$MAIN_TEX_FILE" # Compile only main.tex
-        mv "$OUTPUT_DIR/main.pdf" "$OUTPUT_DIR/$OUTPUT_PDF_NAME" # Rename the generated main.pdf
-        latexmk -c "$MAIN_TEX_FILE" # Clean auxiliary files for main.tex
+        # The final target directory for the PDF, relative to the *repository root*
+        FINAL_PDF_OUTPUT_DIR="${{ github.workspace }}/generated-pdfs"
+        OUTPUT_PDF_NAME="aluffi-solutions-book.pdf"
+
+        echo "Compiling $MAIN_TEX_FILE from ${{ env.TEX_ROOT }} and outputting to $FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME..."
+        
+        # Compile using latexmk, outputting auxiliary files and main.pdf to TEMP_LATEX_OUTPUT_DIR
+        latexmk -pdf -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
+
+        # Ensure the final output directory exists for the move
+        mkdir -p "$FINAL_PDF_OUTPUT_DIR"
+        
+        # Move the compiled PDF from the temporary location to the final desired location
+        mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
+
+        # Clean up auxiliary files from the temporary output directory
+        latexmk -c -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
+        rm -rf "$TEMP_LATEX_OUTPUT_DIR" # Remove the temporary directory itself
 
     - name: Copy generated PDFs into Jekyll site assets
       run: |
