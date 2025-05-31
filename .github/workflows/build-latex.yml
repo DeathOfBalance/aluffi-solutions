@@ -115,10 +115,22 @@ jobs:
         bundler-cache: true # runs 'bundle install' and caches gems
         cache-version: 1 # Increment this number if you change Gemfile.lock
 
+    - name: Diagnose Ruby/Jekyll Setup (Optional, for debugging)
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Contents of Gemfile.lock in docs/: $(ls docs/Gemfile.lock || echo 'Gemfile.lock not found')"
+        echo "Bundler version: $(bundle --version)"
+        echo "Jekyll executable location: $(bundle exec which jekyll || echo 'Jekyll executable not found via bundle exec')"
+        echo "PATH: $PATH"
+      # This step should run from the docs directory to correctly check bundle context
+      working-directory: ${{ env.JEKYLL_ROOT }}
+
+
     - name: Build Jekyll site
       run: |
-        cd ${{ env.JEKYLL_ROOT }}
+        echo "Attempting to build Jekyll site..."
         bundle exec jekyll build --trace # --trace for debugging if needed
+      working-directory: ${{ env.JEKYLL_ROOT }} # Ensure this is always set for Jekyll commands
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
