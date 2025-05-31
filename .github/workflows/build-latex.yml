@@ -21,15 +21,12 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Cache TinyTeX Installation
-      # This step attempts to restore a previous TinyTeX installation from cache.
-      # It will run before the 'Set up TinyTeX' step.
       uses: actions/cache@v4
       with:
-        path: ~/.TinyTeX # The default installation path for TinyTeX on Ubuntu
-        # The cache key will now change ONLY if latex_packages.txt changes,
-        # forcing a fresh install only when your LaTeX dependencies change.
-        key: ${{ runner.os }}-tinytex-${{ hashFiles(env.TEX_ROOT}}/latex_packages.txt') }}
-        restore-keys: | # Allows restoring from a slightly older, but compatible, cache
+        path: ~/.TinyTeX
+        # CORRECTED LINE BELOW:
+        key: ${{ runner.os }}-tinytex-${{ hashFiles('${{ env.TEX_ROOT}}/latex_packages.txt') }}
+        restore-keys: |
           ${{ runner.os }}-tinytex-
 
     - name: Set up TinyTeX
