@@ -1,4 +1,4 @@
-# .github/workflows/build-latex.yml (Revised for Caching and Package Installation)
+# .github/workflows/build-latex.yml (Pinning Action Version)
 
 name: Build LaTeX Solutions and Publish
 
@@ -12,15 +12,17 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     env:
-      TEX_ROOT: tex-source # Adjust this to your main solutions directory
-      JEKYLL_ROOT: docs     # The folder where your Jekyll site lives
+      TEX_ROOT: tex-source 
+      JEKYLL_ROOT: docs     
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # === PINNED TINYTEX ACTION VERSION ===
     - name: Set up TinyTeX and Cache Key Packages
-      uses: r-lib/actions/setup-tinytex@v2
+      # Pinning to a specific v2.x.x version to ensure input compatibility
+      uses: r-lib/actions/setup-tinytex@v2.3.0 
       with:
         cache: true
         tlmgr-packages: |
@@ -31,15 +33,16 @@ jobs:
           amsthm
           mathtools 
           latexmk
-        cache-version: 2 # Increment this if you change the packages or their versions
-    # Make sure this cache-version is not accidentally changed elsewhere or dynamically
+        # Increment cache-version if you change tlmgr-packages or suspect a stale cache
+        cache-version: 3 # Incremented due to action version change and to ensure fresh attempt
+    # === END PINNED TINYTEX ACTION VERSION ===
 
     - name: Check Packages After setup-tinytex
-      if: always() # Ensure this step runs even if the previous one has warnings
+      if: always() 
       run: |
         echo "Path: $PATH"
         echo "Which tlmgr: $(which tlmgr)"
-        echo "TinyTeX Root: $(dirname $(which tlmgr) | xargs dirname)" # Attempts to find TinyTeX root
+        echo "TinyTeX Root: $(dirname $(which tlmgr) | xargs dirname)" 
         echo "Listing tlmgr conf:"
         tlmgr conf
         echo "---"
@@ -56,21 +59,17 @@ jobs:
       shell: bash
 
     - name: Install Additional LaTeX Packages from File
-      # This step installs any remaining packages listed in latex_packages.txt
-      # that might not have been covered by the setup-tinytex step.
-      # tlmgr will skip packages already installed.
       run: |
         echo "Ensuring all LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt are present..."
         PACKAGE_FILE="${{ env.TEX_ROOT }}/latex_packages.txt"
         
+        # IMPORTANT: For this test, ensure latex_packages.txt does NOT list
+        # collection-fontsrecommended, collection-latexrecommended, or other packages
+        # already specified in the 'tlmgr-packages' of the setup-tinytex step above.
+        # This file should only contain *additional* packages.
         if [ -f "$PACKAGE_FILE" ] && [ -s "$PACKAGE_FILE" ]; then
           echo "Packages to install/verify from $PACKAGE_FILE:"
-          # Print non-empty, non-comment lines from the package file
           grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" || echo "No non-comment packages in file to list."
-
-          # Read non-empty, non-comment lines, and pass to tlmgr install
-          # Removed redundant '-n 1' as '-I {}' implies processing one line at a time.
-          # The '|| true' allows the workflow to continue if a package fails, is a meta-package, or is already installed.
           grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" | xargs -r -I {} sh -c 'echo "Attempting to install/verify from file: {}"; tlmgr install "{}" || echo "Notice: Could not install {} from file, or it was already present/a meta-package, or it is part of a collection already installed."'
         else
           echo "No packages listed in $PACKAGE_FILE, or file is empty/not found. Skipping this step."
@@ -92,26 +91,21 @@ jobs:
 
         echo "Compiling $MAIN_TEX_FILE from ${{ env.TEX_ROOT }} and outputting to $FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME..."
         
-        # Compile using latexmk
-        # Added -interaction=nonstopmode to prevent hangs on errors for CI
         latexmk -pdf -interaction=nonstopmode -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
 
         mkdir -p "$FINAL_PDF_OUTPUT_DIR"
-        # Check if PDF was created before moving
         if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.pdf" ]; then
           mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
           echo "PDF successfully compiled and moved."
         else
           echo "Error: PDF compilation failed. No PDF file found at $TEMP_LATEX_OUTPUT_DIR/main.pdf."
-          # Optionally, print the log file content for easier debugging in GitHub Actions
           if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.log" ]; then
             echo "Displaying contents of $TEMP_LATEX_OUTPUT_DIR/main.log:"
             cat "$TEMP_LATEX_OUTPUT_DIR/main.log"
           fi
-          exit 1 # Fail the step if PDF is not created
+          exit 1 
         fi
 
-        # Clean up auxiliary files
         latexmk -c -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
         rm -rf "$TEMP_LATEX_OUTPUT_DIR"
 
@@ -119,22 +113,21 @@ jobs:
       run: |
         JEKYLL_ASSETS_DIR="${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/"
         mkdir -p "$JEKYLL_ASSETS_DIR"
-        # Ensure the PDF exists before copying
         PDF_TO_COPY="${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf"
         if [ -f "$PDF_TO_COPY" ]; then
           cp "$PDF_TO_COPY" "$JEKYLL_ASSETS_DIR"
           echo "PDF copied to Jekyll assets."
         else
           echo "Error: Compiled PDF not found at $PDF_TO_COPY. Cannot copy to Jekyll assets."
-          exit 1 # Fail the step if PDF is not found
+          exit 1 
         fi
 
     - name: Setup Ruby for Jekyll
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1' # Specify a Ruby version compatible with your Jekyll setup
+        ruby-version: '3.1' 
         bundler-cache: true 
-        cache-version: 1    # Increment if Gemfile.lock changes
+        cache-version: 1    
 
     - name: List contents of Jekyll directory
       run: ls -lR
@@ -167,4 +160,3 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site
-        # cname: your-custom-domain.com # Optional
