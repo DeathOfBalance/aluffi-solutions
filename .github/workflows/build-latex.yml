@@ -26,19 +26,19 @@ jobs:
     - name: Cache LaTeX packages
       uses: actions/cache@v4
       with:
-        path: /tmp/texlive
-        key: ${{ runner.os }}-texlive-minimal-${{ hashFiles('tex-source/**/*.tex') }}
+        path: /var/cache/apt
+        key: ${{ runner.os }}-latex-packages-v2
         restore-keys: |
-          ${{ runner.os }}-texlive-minimal-
+          ${{ runner.os }}-latex-packages-
     
     - name: Install TeX Live (minimal)
       run: |
-        if [ ! -d "/tmp/texlive" ]; then
+        # Check if LaTeX is already installed
+        if ! command -v pdflatex &> /dev/null; then
           sudo apt-get update
-          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended
-          # Create a dummy directory for caching consistency
-          mkdir -p /tmp/texlive
-          touch /tmp/texlive/.installed
+          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+        else
+          echo "LaTeX already installed, skipping installation"
         fi
     
 
