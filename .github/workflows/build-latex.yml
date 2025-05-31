@@ -81,8 +81,10 @@ jobs:
     
     - name: Build PDF from LaTeX
       run: |
-        # Assuming your main LaTeX file is main.tex
-        # Adjust the filename as needed
+        # Change to tex-source directory
+        cd tex-source
+        
+        # Build PDF from LaTeX files in tex-source folder
         if [ -f "main.tex" ]; then
           pdflatex main.tex
           pdflatex main.tex  # Run twice for references
@@ -90,13 +92,14 @@ jobs:
           pdflatex document.tex
           pdflatex document.tex
         else
-          echo "No LaTeX file found. Please ensure you have a .tex file in your repository."
+          echo "No LaTeX file found in tex-source directory. Please ensure you have a .tex file in tex-source/."
           exit 1
         fi
         
-        # Move PDF to Jekyll assets directory
+        # Move PDF to Jekyll assets directory (back to root level)
+        cd ..
         mkdir -p assets
-        mv *.pdf assets/ 2>/dev/null || true
+        mv tex-source/*.pdf assets/ 2>/dev/null || true
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
