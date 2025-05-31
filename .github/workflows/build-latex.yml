@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: # <--- ADD THIS BLOCK
+      contents: write # Allows GITHUB_TOKEN to write to the repository
+      pages: write    # Allows GITHUB_TOKEN to deploy to GitHub Pages
+      id-token: write # Required for OpenID Connect authentication, good practice for Pages deployments
 
     env:
       TEX_ROOT: tex-source
