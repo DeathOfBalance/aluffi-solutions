@@ -22,10 +22,13 @@ jobs:
 
     - name: Cache TinyTeX Installation
       uses: actions/cache@v4
-      id: tinytex-cache # <--- ADD THIS ID
+      id: tinytex-cache
       with:
         path: ~/.TinyTeX
-        key: ${{ runner.os }}-tinytex-${{ hashFiles('${{ env.TEX_ROOT}}/latex_packages.txt') }}
+        # CORRECTED KEY LINE BELOW:
+        key: ${{ runner.os }}-tinytex-${{ hashFiles(format('{0}/{1}', env.TEX_ROOT, 'latex_packages.txt')) }}
+        # Alternatively, a simpler concatenation might also work, but 'format' is often clearer:
+        # key: ${{ runner.os }}-tinytex-${{ hashFiles(env.TEX_ROOT + '/latex_packages.txt') }}
         restore-keys: |
           ${{ runner.os }}-tinytex-
 
