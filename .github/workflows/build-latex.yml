@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - actions
 
 jobs:
   build:
@@ -33,11 +32,12 @@ jobs:
         uses: r-lib/actions/setup-tinytex@v2
 
       - name: Install required LaTeX packages
-        working-directory: ${{ env.TEX_ROOT }}
         run: |
-            xargs tlmgr install < latex_packages.txt
-
-
+          tlmgr install \
+            collection-fontsrecommended \
+            collection-latexrecommended \
+            latexmk \
+            mathtools
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
         run: |
@@ -45,12 +45,10 @@ jobs:
           latexmk -pdf -interaction=nonstopmode -outdir=build main.tex
           mv build/main.pdf ../generated-pdfs/${{ env.PDF_OUTPUT_NAME }}
           latexmk -c -outdir=build main.tex
-
       - name: Copy generated PDF to Jekyll assets
         run: |
           mkdir -p ${{ env.JEKYLL_ROOT }}/assets/solutions
           cp generated-pdfs/${{ env.PDF_OUTPUT_NAME }} ${{ env.JEKYLL_ROOT }}/assets/solutions/
-
       - name: Setup Ruby for Jekyll
         uses: ruby/setup-ruby@v1
         with:
@@ -70,11 +68,9 @@ jobs:
         run: |
           echo "--- Contents of the Jekyll root directory (${{ env.JEKYLL_ROOT }}/): ---"
           ls -F ${{ env.JEKYLL_ROOT }}
-
           echo "--- Contents of the Jekyll _site directory (${{ env.JEKYLL_ROOT }}/_site/): ---"
           # This command will list contents if _site exists, or print an error if it doesn't
           ls -F ${{ env.JEKYLL_ROOT }}/_site || echo "Error: ${{ env.JEKYLL_ROOT }}/_site directory not found or empty."
-
           echo "--- Checking for Jekyll build errors (last 20 lines of build log): ---"
           # This tries to capture recent build output from Jekyll for errors.
           # Note: this might not capture all Jekyll errors if they happen earlier or are swallowed.
