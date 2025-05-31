@@ -21,13 +21,21 @@ jobs:
       uses: actions/checkout@v4
 
     # === CORRECTED TeX LIVE SETUP ===
-    - name: Set up TinyTeX
-      # This action installs TinyTeX. We no longer pass 'packages' here.
-      uses: r-lib/actions/setup-tinytex@v2
+    # === NEW CACHING STEP FOR TinyTeX ===
+    - name: Cache TinyTeX
+      uses: actions/cache@v4 # Use the generic caching action
       with:
-        cache: true # <--- ADD THIS LINE TO ENABLE CACHING
-        # Optionally, you can specify a version for the cache key, e.g.:
-        # cache-version: 1
+        path: ~/.TinyTeX # The default installation path for TinyTeX
+        key: ${{ runner.os }}-tinytex-${{ hashFiles('.github/workflows/build-latex.yml') }} # Unique cache key
+        # You could also use a version or date in the key, e.g.:
+        # key: ${{ runner.os }}-tinytex-2025-05-31
+        # This key will change if you modify the workflow file, invalidating the cache
+        # and forcing a fresh install when needed.
+    # === END NEW CACHING STEP ===
+
+    - name: Set up TinyTeX # Now this step will either restore from cache or install fresh
+      uses: r-lib/actions/setup-tinytex@v2
+      # Remove the 'with: cache: true' line that caused the warning. No 'with' input needed here.
 
     - name: Install LaTeX Packages
       # Use tlmgr (TeX Live Manager) to install specific packages
