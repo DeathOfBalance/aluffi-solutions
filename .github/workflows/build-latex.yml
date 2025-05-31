@@ -15,49 +15,30 @@ jobs:
       JEKYLL_ROOT: docs      # The folder where your Jekyll site lives
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up TeX Live
-      uses: r-lib/actions/setup-tinytex@v2
-      with:
-        packages: >
-          latexmk
-          collection-fontsrecommended
-          collection-latexrecommended
-          amsmath
-          amssymb
-          amsthm
-          # Add any other LaTeX packages you use here
+    # ... (previous steps: checkout, setup TeX Live) ...
 
     - name: Create directory for generated PDFs
       run: mkdir -p ${{ github.workspace }}/generated-pdfs
 
-    - name: Compile LaTeX files to PDF
+    - name: Compile Main LaTeX Document to PDF
       run: |
-        find ${{ env.TEX_ROOT }} -name "*.tex" | while read file; do
-          filename=$(basename "$file" .tex)
-          dir_path=$(dirname "$file")
-          # Replace slashes in dir_path with underscores for a flatter PDF name
-          # e.g., textbook-name/chapter-1/problem.tex -> textbook-name_chapter-1_problem.pdf
-          relative_dir=${dir_path#${TEX_ROOT}/} # Remove TEX_ROOT prefix
-          safe_dir_name=${relative_dir//\//_} # Replace slashes with underscores
+        # We only compile main.tex, which includes all other sections
+        MAIN_TEX_FILE="${{ env.TEX_ROOT }}/main.tex"
+        OUTPUT_DIR="${{ github.workspace }}/generated-pdfs"
+        OUTPUT_PDF_NAME="aluffi-solutions-book.pdf" # Choose a meaningful name for your complete book PDF
 
-          output_pdf_name="${safe_dir_name:+"$safe_dir_name_"}${filename}.pdf" # Add underscore if safe_dir_name is not empty
-          if [ "${safe_dir_name}" = "" ]; then
-            output_pdf_name="${filename}.pdf"
-          fi
-
-          echo "Compiling $file to ${output_pdf_name}..."
-          latexmk -pdf -outdir=${{ github.workspace }}/generated-pdfs "$file"
-          mv ${{ github.workspace }}/generated-pdfs/"$filename".pdf ${{ github.workspace }}/generated-pdfs/"$output_pdf_name"
-          latexmk -c "$file" # Clean up auxiliary files
-        done
+        echo "Compiling $MAIN_TEX_FILE to $OUTPUT_DIR/$OUTPUT_PDF_NAME..."
+        latexmk -pdf -outdir="$OUTPUT_DIR" "$MAIN_TEX_FILE" # Compile only main.tex
+        mv "$OUTPUT_DIR/main.pdf" "$OUTPUT_DIR/$OUTPUT_PDF_NAME" # Rename the generated main.pdf
+        latexmk -c "$MAIN_TEX_FILE" # Clean auxiliary files for main.tex
 
     - name: Copy generated PDFs into Jekyll site assets
       run: |
-        mkdir -p ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/
-        cp ${{ github.workspace }}/generated-pdfs/*.pdf ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/
+        JEKYLL_ASSETS_DIR="${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/"
+        mkdir -p "$JEKYLL_ASSETS_DIR"
+        # Copy the single generated PDF
+        cp ${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf "$JEKYLL_ASSETS_DIR"
+
 
     - name: Setup Ruby for Jekyll
       uses: ruby/setup-ruby@v1
