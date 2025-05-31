@@ -4,6 +4,7 @@ collection-latexrecommended
 amsmath
 amssymb
 amsthm
+enumitem
 # Add any other specific packages your LaTeX source uses here, each on a new line
 # graphicx
 # hyperref

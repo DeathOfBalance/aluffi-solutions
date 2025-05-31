@@ -34,11 +34,7 @@ jobs:
 
       - name: Install required LaTeX packages
         run: |
-          tlmgr install \
-            collection-fontsrecommended \
-            collection-latexrecommended \
-            latexmk \
-            mathtools
+            xargs tlmgr install < latex_packages.txt
 
 
       - name: Compile LaTeX document with latexmk
