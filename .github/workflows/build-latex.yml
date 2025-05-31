@@ -19,29 +19,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache additional TeX packages
+      - name: Cache TinyTeX
         uses: actions/cache@v3
         with:
           path: ~/.TinyTeX
           key: texlive-${{ runner.os }}-v1
 
-      - name: Set up TinyTeX with required packages
+      - name: Install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
-        with:
-          cache: true
-          tlmgr-packages: |
-            collection-fontsrecommended
-            collection-latexrecommended
-            amsmath
-            amssymb
-            amsthm
-            # mathtools
-            latexmk
-          cache-version: 1
 
-             - name: Ensure extra LaTeX packages are installed
+      - name: Install required LaTeX packages
         run: |
-          tlmgr install mathtools bm
+          tlmgr install \
+            collection-fontsrecommended \
+            collection-latexrecommended \
+            latexmk \
+            amsmath amssymb amsthm mathtools bm
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
@@ -64,13 +57,11 @@ jobs:
 
       - name: Install Jekyll dependencies
         working-directory: ${{ env.JEKYLL_ROOT }}
-        run: |
-          bundle install
+        run: bundle install
 
       - name: Build Jekyll site
         working-directory: ${{ env.JEKYLL_ROOT }}
-        run: |
-          bundle exec jekyll build
+        run: bundle exec jekyll build
 
       - name: Deploy Jekyll site to GitHub Pages
         if: github.ref == 'refs/heads/main'
