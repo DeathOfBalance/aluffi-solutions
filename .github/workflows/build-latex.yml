@@ -19,15 +19,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # === MODIFIED TINYTEX SETUP WITH EXPLICIT PACKAGE CACHING ===
     - name: Set up TinyTeX and Cache Key Packages
       uses: r-lib/actions/setup-tinytex@v2
       with:
-        # 'cache: true' is the default for v2.
         cache: true
-        # Add your largest/most stable packages/collections here.
-        # Explicitly adding core packages like amsmath, amssymb, amsthm, mathtools
-        # alongside collections ensures they are prioritized for caching by setup-tinytex.
         tlmgr-packages: |
           collection-fontsrecommended
           collection-latexrecommended
@@ -36,13 +31,29 @@ jobs:
           amsthm
           mathtools 
           latexmk
-          # Add any other frequently used, large, or foundational packages/collections
-          # e.g., scheme-full (if you need a very comprehensive setup)
-          # graphicx # (usually part of latex-recommended or base)
-        # Increment 'cache-version' if you make significant changes to 'tlmgr-packages'
-        # or if you suspect the cache is stale and want to force a refresh.
-        cache-version: 2 # Incremented due to changes in tlmgr-packages
-    # === END MODIFIED TINYTEX SETUP ===
+        cache-version: 2 # Increment this if you change the packages or their versions
+    # Make sure this cache-version is not accidentally changed elsewhere or dynamically
+
+    - name: Check Packages After setup-tinytex
+      if: always() # Ensure this step runs even if the previous one has warnings
+      run: |
+        echo "Path: $PATH"
+        echo "Which tlmgr: $(which tlmgr)"
+        echo "TinyTeX Root: $(dirname $(which tlmgr) | xargs dirname)" # Attempts to find TinyTeX root
+        echo "Listing tlmgr conf:"
+        tlmgr conf
+        echo "---"
+        echo "Checking for presence of key packages/collections after setup-tinytex step:"
+        echo "Attempting to get info for collection-fontsrecommended..."
+        tlmgr info collection-fontsrecommended || echo "INFO: collection-fontsrecommended not found or tlmgr info failed after setup-tinytex"
+        echo "---"
+        echo "Attempting to get info for collection-latexrecommended..."
+        tlmgr info collection-latexrecommended || echo "INFO: collection-latexrecommended not found or tlmgr info failed after setup-tinytex"
+        echo "---"
+        echo "Attempting to get info for mathtools..."
+        tlmgr info mathtools || echo "INFO: mathtools not found or tlmgr info failed after setup-tinytex"
+        echo "---"
+      shell: bash
 
     - name: Install Additional LaTeX Packages from File
       # This step installs any remaining packages listed in latex_packages.txt
