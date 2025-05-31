@@ -1,4 +1,4 @@
-# .github/workflows/build-latex.yml (Revised for Caching)
+# .github/workflows/build-latex.yml (Revised for Caching and Package Installation)
 
 name: Build LaTeX Solutions and Publish
 
@@ -23,49 +23,48 @@ jobs:
     - name: Set up TinyTeX and Cache Key Packages
       uses: r-lib/actions/setup-tinytex@v2
       with:
-        # 'cache: true' is the default for v2. Explicitly stating it is fine.
-        # If the "Unexpected input(s) 'cache'" warning truly comes from this line,
-        # ensure no typos/invisible characters, or try removing this line.
+        # 'cache: true' is the default for v2.
         cache: true
         # Add your largest/most stable packages/collections here.
-        # This helps ensure they are part of the cache key used by setup-tinytex.
+        # Explicitly adding core packages like amsmath, amssymb, amsthm, mathtools
+        # alongside collections ensures they are prioritized for caching by setup-tinytex.
         tlmgr-packages: |
           collection-fontsrecommended
           collection-latexrecommended
+          amsmath
+          amssymb
+          amsthm
+          mathtools 
+          latexmk
           # Add any other frequently used, large, or foundational packages/collections
           # e.g., scheme-full (if you need a very comprehensive setup)
-          # Or specific packages like:
-          # amsmath
-          # graphicx
+          # graphicx # (usually part of latex-recommended or base)
         # Increment 'cache-version' if you make significant changes to 'tlmgr-packages'
         # or if you suspect the cache is stale and want to force a refresh.
-        cache-version: 1 
+        cache-version: 2 # Incremented due to changes in tlmgr-packages
     # === END MODIFIED TINYTEX SETUP ===
 
     - name: Install Additional LaTeX Packages from File
-      # This step installs any remaining packages listed in latex_packages.txt.
-      # tlmgr will skip packages already installed by the 'setup-tinytex' step.
+      # This step installs any remaining packages listed in latex_packages.txt
+      # that might not have been covered by the setup-tinytex step.
+      # tlmgr will skip packages already installed.
       run: |
-        echo "Updating tlmgr itself (optional, often not needed with cached TinyTeX)..."
-        # tlmgr update --self || true # Consider if this is needed; can be slow
-
         echo "Ensuring all LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt are present..."
         PACKAGE_FILE="${{ env.TEX_ROOT }}/latex_packages.txt"
         
-        if [ -s "$PACKAGE_FILE" ]; then
+        if [ -f "$PACKAGE_FILE" ] && [ -s "$PACKAGE_FILE" ]; then
           echo "Packages to install/verify from $PACKAGE_FILE:"
           # Print non-empty, non-comment lines from the package file
-          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" || echo "No non-comment packages in file."
+          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" || echo "No non-comment packages in file to list."
 
           # Read non-empty, non-comment lines, and pass to tlmgr install
+          # Removed redundant '-n 1' as '-I {}' implies processing one line at a time.
           # The '|| true' allows the workflow to continue if a package fails, is a meta-package, or is already installed.
-          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" | xargs -r -n 1 -I {} sh -c 'echo "Attempting to install/verify: {}"; tlmgr install "{}" --no-depends || tlmgr install "{}" || echo "Notice: Could not install {} or it was already present/a meta-package."'
-          # The '--no-depends' first attempt can speed things up if dependencies are already met.
-          # The second attempt 'tlmgr install "{}"' is a fallback.
+          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" | xargs -r -I {} sh -c 'echo "Attempting to install/verify from file: {}"; tlmgr install "{}" || echo "Notice: Could not install {} from file, or it was already present/a meta-package, or it is part of a collection already installed."'
         else
-          echo "No packages listed in $PACKAGE_FILE or file is empty/not found."
+          echo "No packages listed in $PACKAGE_FILE, or file is empty/not found. Skipping this step."
         fi
-        echo "LaTeX package installation process complete."
+        echo "Additional LaTeX package installation process from file complete."
 
     - name: Create directory for generated PDFs
       run: mkdir -p ${{ github.workspace }}/generated-pdfs
@@ -83,11 +82,25 @@ jobs:
         echo "Compiling $MAIN_TEX_FILE from ${{ env.TEX_ROOT }} and outputting to $FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME..."
         
         # Compile using latexmk
-        latexmk -pdf -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
+        # Added -interaction=nonstopmode to prevent hangs on errors for CI
+        latexmk -pdf -interaction=nonstopmode -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
 
         mkdir -p "$FINAL_PDF_OUTPUT_DIR"
-        mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
+        # Check if PDF was created before moving
+        if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.pdf" ]; then
+          mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
+          echo "PDF successfully compiled and moved."
+        else
+          echo "Error: PDF compilation failed. No PDF file found at $TEMP_LATEX_OUTPUT_DIR/main.pdf."
+          # Optionally, print the log file content for easier debugging in GitHub Actions
+          if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.log" ]; then
+            echo "Displaying contents of $TEMP_LATEX_OUTPUT_DIR/main.log:"
+            cat "$TEMP_LATEX_OUTPUT_DIR/main.log"
+          fi
+          exit 1 # Fail the step if PDF is not created
+        fi
 
+        # Clean up auxiliary files
         latexmk -c -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
         rm -rf "$TEMP_LATEX_OUTPUT_DIR"
 
@@ -95,7 +108,15 @@ jobs:
       run: |
         JEKYLL_ASSETS_DIR="${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/"
         mkdir -p "$JEKYLL_ASSETS_DIR"
-        cp ${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf "$JEKYLL_ASSETS_DIR"
+        # Ensure the PDF exists before copying
+        PDF_TO_COPY="${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf"
+        if [ -f "$PDF_TO_COPY" ]; then
+          cp "$PDF_TO_COPY" "$JEKYLL_ASSETS_DIR"
+          echo "PDF copied to Jekyll assets."
+        else
+          echo "Error: Compiled PDF not found at $PDF_TO_COPY. Cannot copy to Jekyll assets."
+          exit 1 # Fail the step if PDF is not found
+        fi
 
     - name: Setup Ruby for Jekyll
       uses: ruby/setup-ruby@v1
