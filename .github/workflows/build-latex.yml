@@ -1,3 +1,5 @@
+# .github/workflows/build-latex.yml
+
 name: Build LaTeX PDF and Deploy Jekyll
 
 on:
@@ -19,23 +21,100 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache TinyTeX
-        uses: actions/cache@v3
+      # STEP 1: Generate a custom hash for latex_packages.txt
+      # This provides a stable key for caching.
+      - name: Generate custom hash for latex_packages.txt
+        id: latex_packages_hash # Assign an ID to this step to access its outputs
+        run: |
+          FILE_PATH="${{ env.TEX_ROOT }}/latex_packages.txt"
+          # Check if the file exists before hashing
+          if [ -f "$FILE_PATH" ]; then
+            HASH=$(sha256sum "$FILE_PATH" | awk '{print $1}')
+            echo "Debug: Calculated SHA256 Hash for $FILE_PATH: $HASH"
+            echo "hash=$HASH" >> $GITHUB_OUTPUT # Set an output variable named 'hash'
+          else
+            echo "Error: ${FILE_PATH} not found for hashing. This will cause cache miss."
+            echo "hash=NO_FILE_HASH" >> $GITHUB_OUTPUT # Fallback if file not found
+          fi
+
+      # STEP 2: Restore TinyTeX installation from cache
+      - name: Restore TinyTeX Installation from Cache
+        uses: actions/cache@v4
+        id: tinytex-cache-restore # Assign an ID to check for cache hit
         with:
           path: ~/.TinyTeX
-          key: texlive-${{ runner.os }}-v1
+          # Use the manually generated hash as part of the key
+          key: tinytex-${{ runner.os }}-${{ steps.latex_packages_hash.outputs.hash }}
+          restore-keys: |
+            tinytex-${{ runner.os }}- # Fallback to any OS-specific TinyTeX cache
 
-      - name: Install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2
-
-      - name: Install required LaTeX packages
+      # STEP 3: Conditionally install TinyTeX and LaTeX packages
+      # This entire block only runs if the cache was NOT hit.
+      - name: Install TinyTeX and LaTeX Packages (on cache miss)
+        # Only run this step if the previous cache restore was NOT a hit
+        if: steps.tinytex-cache-restore.outputs.cache-hit != 'true'
         run: |
+          echo "Cache miss detected. Installing TinyTeX and packages from scratch."
+          # Install base TinyTeX
+          curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+
+          # Add TinyTeX to PATH for this run
+          export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
+          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:' '[:lower:]')" >> $GITHUB_PATH
+
+          echo "Updating tlmgr itself..."
+          tlmgr update --self || true
+
+          echo "Installing specified LaTeX packages..."
           tlmgr install \
             collection-fontsrecommended \
             collection-latexrecommended \
             latexmk \
             mathtools
+          echo "LaTeX package installation complete."
 
+      # STEP 4: (Optional, runs on cache hit) Ensure TinyTeX is in PATH and packages are updated
+      - name: Configure TinyTeX (on cache hit)
+        if: steps.tinytex-cache-restore.outputs.cache-hit == 'true'
+        run: |
+          echo "Cache hit detected. Ensuring TinyTeX is configured."
+          # Add TinyTeX to PATH for this run (necessary after cache restore)
+          export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
+          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:' '[:lower:]')" >> $GITHUB_PATH
+
+          echo "Updating tlmgr itself..."
+          tlmgr update --self || true
+          # Re-running tlmgr install on a hit will be very fast as packages are already present.
+          echo "Verifying specified LaTeX packages (should be very fast)..."
+          tlmgr install \
+            collection-fontsrecommended \
+            collection-latexrecommended \
+            latexmk \
+            mathtools
+          echo "LaTeX package verification complete."
+
+      # STEP 5: Save TinyTeX installation to cache (only if a cache miss occurred)
+      - name: Save TinyTeX Installation to Cache
+        uses: actions/cache@v4
+        # This step only runs if the 'restore' step indicated a cache miss,
+        # ensuring we save the newly installed TinyTeX with all packages.
+        if: steps.tinytex-cache-restore.outputs.cache-hit != 'true'
+        with:
+          path: ~/.TinyTeX
+          key: tinytex-${{ runner.os }}-${{ steps.latex_packages_hash.outputs.hash }}
+
+
+      # --- Diagnostic Step (Keep for now if needed, remove later) ---
+      - name: Check TinyTeX Cache Status (for debugging)
+        run: |
+          echo "Cache Hit Status: ${{ steps.tinytex-cache-restore.outputs.cache-hit }}"
+          echo "Calculated Cache Key: tinytex-${{ runner.os }}-${{ steps.latex_packages_hash.outputs.hash }}"
+          echo "Content of latex_packages.txt for hashing confirmation:"
+          cat ${{ env.TEX_ROOT}}/latex_packages.txt || echo "ERROR: latex_packages.txt not found!"
+          echo "Listing file for confirmation: "
+          ls -l ${{ env.TEX_ROOT}}/latex_packages.txt || echo "ERROR: ls failed for latex_packages.txt"
+          echo "--- END Cache Status Check ---"
+      # --- End Diagnostic Step ---
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
