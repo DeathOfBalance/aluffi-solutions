@@ -1,170 +1,76 @@
-# .github/workflows/build-latex.yml (Revised for Caching and Package Installation)
-
-name: Build LaTeX Solutions and Publish
+name: Build LaTeX PDF and Deploy Jekyll
 
 on:
   push:
     branches:
       - main
-      - test
+      - actions
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
+
     env:
-      TEX_ROOT: tex-source # Adjust this to your main solutions directory
-      JEKYLL_ROOT: docs     # The folder where your Jekyll site lives
+      TEX_ROOT: tex-source
+      JEKYLL_ROOT: docs
+      PDF_OUTPUT_NAME: aluffi-solutions-book.pdf
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up TinyTeX and Cache Key Packages
-      uses: r-lib/actions/setup-tinytex@v2
-      with:
-        cache: true
-        tlmgr-packages: |
-          collection-fontsrecommended
-          collection-latexrecommended
-          amsmath
-          amssymb
-          amsthm
-          mathtools 
-          latexmk
-        cache-version: 2 # Increment this if you change the packages or their versions
-    # Make sure this cache-version is not accidentally changed elsewhere or dynamically
+      - name: Cache additional TeX packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.TinyTeX
+          key: texlive-${{ runner.os }}-v1
 
-    - name: Check Packages After setup-tinytex
-      if: always() # Ensure this step runs even if the previous one has warnings
-      run: |
-        echo "Path: $PATH"
-        echo "Which tlmgr: $(which tlmgr)"
-        echo "TinyTeX Root: $(dirname $(which tlmgr) | xargs dirname)" # Attempts to find TinyTeX root
-        echo "Listing tlmgr conf:"
-        tlmgr conf
-        echo "---"
-        echo "Checking for presence of key packages/collections after setup-tinytex step:"
-        echo "Attempting to get info for collection-fontsrecommended..."
-        tlmgr info collection-fontsrecommended || echo "INFO: collection-fontsrecommended not found or tlmgr info failed after setup-tinytex"
-        echo "---"
-        echo "Attempting to get info for collection-latexrecommended..."
-        tlmgr info collection-latexrecommended || echo "INFO: collection-latexrecommended not found or tlmgr info failed after setup-tinytex"
-        echo "---"
-        echo "Attempting to get info for mathtools..."
-        tlmgr info mathtools || echo "INFO: mathtools not found or tlmgr info failed after setup-tinytex"
-        echo "---"
-      shell: bash
+      - name: Set up TinyTeX with required packages
+        uses: r-lib/actions/setup-tinytex@v2
+        with:
+          cache: true
+          tlmgr-packages: |
+            collection-fontsrecommended
+            collection-latexrecommended
+            amsmath
+            amssymb
+            amsthm
+            mathtools
+            latexmk
+          cache-version: 1
 
-    - name: Install Additional LaTeX Packages from File
-      # This step installs any remaining packages listed in latex_packages.txt
-      # that might not have been covered by the setup-tinytex step.
-      # tlmgr will skip packages already installed.
-      run: |
-        echo "Ensuring all LaTeX packages from ${{ env.TEX_ROOT }}/latex_packages.txt are present..."
-        PACKAGE_FILE="${{ env.TEX_ROOT }}/latex_packages.txt"
-        
-        if [ -f "$PACKAGE_FILE" ] && [ -s "$PACKAGE_FILE" ]; then
-          echo "Packages to install/verify from $PACKAGE_FILE:"
-          # Print non-empty, non-comment lines from the package file
-          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" || echo "No non-comment packages in file to list."
+      - name: Compile LaTeX document with latexmk
+        working-directory: ${{ env.TEX_ROOT }}
+        run: |
+          mkdir -p ../generated-pdfs
+          latexmk -pdf -interaction=nonstopmode -outdir=build main.tex
+          mv build/main.pdf ../generated-pdfs/${{ env.PDF_OUTPUT_NAME }}
+          latexmk -c -outdir=build main.tex
 
-          # Read non-empty, non-comment lines, and pass to tlmgr install
-          # Removed redundant '-n 1' as '-I {}' implies processing one line at a time.
-          # The '|| true' allows the workflow to continue if a package fails, is a meta-package, or is already installed.
-          grep -vE '^\s*#|^\s*$' "$PACKAGE_FILE" | xargs -r -I {} sh -c 'echo "Attempting to install/verify from file: {}"; tlmgr install "{}" || echo "Notice: Could not install {} from file, or it was already present/a meta-package, or it is part of a collection already installed."'
-        else
-          echo "No packages listed in $PACKAGE_FILE, or file is empty/not found. Skipping this step."
-        fi
-        echo "Additional LaTeX package installation process from file complete."
+      - name: Copy generated PDF to Jekyll assets
+        run: |
+          mkdir -p ${{ env.JEKYLL_ROOT }}/assets/solutions
+          cp generated-pdfs/${{ env.PDF_OUTPUT_NAME }} ${{ env.JEKYLL_ROOT }}/assets/solutions/
 
-    - name: Create directory for generated PDFs
-      run: mkdir -p ${{ github.workspace }}/generated-pdfs
+      - name: Setup Ruby for Jekyll
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
 
-    - name: Compile Main LaTeX Document to PDF
-      working-directory: ${{ env.TEX_ROOT }}
-      run: |
-        MAIN_TEX_FILE="main.tex"
-        TEMP_LATEX_OUTPUT_DIR="latex_build_temp"
-        mkdir -p "$TEMP_LATEX_OUTPUT_DIR"
+      - name: Install Jekyll dependencies
+        working-directory: ${{ env.JEKYLL_ROOT }}
+        run: |
+          bundle install
 
-        FINAL_PDF_OUTPUT_DIR="${{ github.workspace }}/generated-pdfs"
-        OUTPUT_PDF_NAME="aluffi-solutions-book.pdf"
+      - name: Build Jekyll site
+        working-directory: ${{ env.JEKYLL_ROOT }}
+        run: |
+          bundle exec jekyll build
 
-        echo "Compiling $MAIN_TEX_FILE from ${{ env.TEX_ROOT }} and outputting to $FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME..."
-        
-        # Compile using latexmk
-        # Added -interaction=nonstopmode to prevent hangs on errors for CI
-        latexmk -pdf -interaction=nonstopmode -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
-
-        mkdir -p "$FINAL_PDF_OUTPUT_DIR"
-        # Check if PDF was created before moving
-        if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.pdf" ]; then
-          mv "$TEMP_LATEX_OUTPUT_DIR/main.pdf" "$FINAL_PDF_OUTPUT_DIR/$OUTPUT_PDF_NAME"
-          echo "PDF successfully compiled and moved."
-        else
-          echo "Error: PDF compilation failed. No PDF file found at $TEMP_LATEX_OUTPUT_DIR/main.pdf."
-          # Optionally, print the log file content for easier debugging in GitHub Actions
-          if [ -f "$TEMP_LATEX_OUTPUT_DIR/main.log" ]; then
-            echo "Displaying contents of $TEMP_LATEX_OUTPUT_DIR/main.log:"
-            cat "$TEMP_LATEX_OUTPUT_DIR/main.log"
-          fi
-          exit 1 # Fail the step if PDF is not created
-        fi
-
-        # Clean up auxiliary files
-        latexmk -c -outdir="$TEMP_LATEX_OUTPUT_DIR" "$MAIN_TEX_FILE"
-        rm -rf "$TEMP_LATEX_OUTPUT_DIR"
-
-    - name: Copy generated PDFs into Jekyll site assets
-      run: |
-        JEKYLL_ASSETS_DIR="${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/assets/solutions/"
-        mkdir -p "$JEKYLL_ASSETS_DIR"
-        # Ensure the PDF exists before copying
-        PDF_TO_COPY="${{ github.workspace }}/generated-pdfs/aluffi-solutions-book.pdf"
-        if [ -f "$PDF_TO_COPY" ]; then
-          cp "$PDF_TO_COPY" "$JEKYLL_ASSETS_DIR"
-          echo "PDF copied to Jekyll assets."
-        else
-          echo "Error: Compiled PDF not found at $PDF_TO_COPY. Cannot copy to Jekyll assets."
-          exit 1 # Fail the step if PDF is not found
-        fi
-
-    - name: Setup Ruby for Jekyll
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.1' # Specify a Ruby version compatible with your Jekyll setup
-        bundler-cache: true 
-        cache-version: 1    # Increment if Gemfile.lock changes
-
-    - name: List contents of Jekyll directory
-      run: ls -lR
-      working-directory: ${{ env.JEKYLL_ROOT }}
-
-    - name: Install Ruby Gems
-      run: |
-        bundle config path vendor/bundle
-        bundle install --jobs 4 --retry 3
-      working-directory: ${{ env.JEKYLL_ROOT }}
-
-    - name: Diagnose Ruby/Jekyll Setup (Optional)
-      run: |
-        echo "Current directory: $(pwd)"
-        echo "Contents of Gemfile.lock: $(ls Gemfile.lock || echo 'Gemfile.lock not found')"
-        echo "Bundler version: $(bundle --version)"
-        echo "Jekyll executable location: $(bundle exec which jekyll || echo 'Jekyll executable not found via bundle exec')"
-        echo "PATH: $PATH"
-      working-directory: ${{ env.JEKYLL_ROOT }}
-
-    - name: Build Jekyll site
-      run: |
-        echo "Attempting to build Jekyll site..."
-        bundle exec jekyll build --trace
-      working-directory: ${{ env.JEKYLL_ROOT }}
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      if: github.ref == 'refs/heads/main'
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ${{ github.workspace }}/${{ env.JEKYLL_ROOT }}/_site
-        # cname: your-custom-domain.com # Optional
+      - name: Deploy Jekyll site to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.JEKYLL_ROOT }}/_site
