@@ -29,14 +29,8 @@ jobs:
         path: ~/texlive-cache
         key: ${{ runner.os }}-latex-packages-v4
         restore-keys: |
-          ${{ runner.os }}-latex-packages-
+           ${{ runner.os }}-latex-packages-
 
-
-    - name: Install lmodern via apt-get
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends fonts-lmodern
-    
     - name: Install TeX Live (minimal)
       run: |
         # Check if cached LaTeX installation exists
@@ -50,14 +44,19 @@ jobs:
             texlive-latex-recommended \
             texlive-fonts-recommended \
             texlive-latex-extra \
-            texlive-fonts-extra
+            texlive-fonts-extra \
+            fonts-lmodern # <--- Install lmodern here directly with TeX Live packages
+          
+          # Update TeX Live's font maps after installing lmodern
+          sudo updmap-sys --force --enable Map lmodern.map # <--- ADD THIS LINE
+          
           # Mark as installed for caching
           mkdir -p ~/texlive-cache
           touch ~/texlive-cache/.installed
         fi
     
+    # Removed the separate "Install lmodern via apt-get" step as it's now integrated
 
-    
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -94,7 +93,7 @@ jobs:
         # Build PDF from LaTeX files in tex-source folder
         if [ -f "main.tex" ]; then
           pdflatex main.tex
-          pdflatex main.tex  # Run twice for references
+          pdflatex main.tex   # Run twice for references
         elif [ -f "document.tex" ]; then
           pdflatex document.tex
           pdflatex document.tex
