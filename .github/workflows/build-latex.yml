@@ -23,42 +23,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     
-    - name: Cache TeX Live
+    - name: Cache LaTeX packages
       uses: actions/cache@v4
       with:
         path: /tmp/texlive
-        key: ${{ runner.os }}-texlive-full-${{ hashFiles('**/*.tex') }}
+        key: ${{ runner.os }}-texlive-minimal-${{ hashFiles('tex-source/**/*.tex') }}
         restore-keys: |
-          ${{ runner.os }}-texlive-full-
-          ${{ runner.os }}-texlive-
+          ${{ runner.os }}-texlive-minimal-
     
-    - name: Install TeX Live
+    - name: Install TeX Live (minimal)
       run: |
         if [ ! -d "/tmp/texlive" ]; then
           sudo apt-get update
-          sudo apt-get install -y wget perl-modules
-          cd /tmp
-          wget -qO- "https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz" | tar -xzf -
-          cd install-tl-*
-          echo "selected_scheme scheme-basic" > texlive.profile
-          echo "tlpdbopt_install_docfiles 0" >> texlive.profile
-          echo "tlpdbopt_install_srcfiles 0" >> texlive.profile
-          echo "TEXDIR /tmp/texlive" >> texlive.profile
-          echo "TEXMFLOCAL /tmp/texlive/texmf-local" >> texlive.profile
-          echo "TEXMFSYSCONFIG /tmp/texlive/texmf-config" >> texlive.profile
-          echo "TEXMFSYSVAR /tmp/texlive/texmf-var" >> texlive.profile
-          ./install-tl -profile texlive.profile
+          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended
+          # Create a dummy directory for caching consistency
+          mkdir -p /tmp/texlive
+          touch /tmp/texlive/.installed
         fi
-        echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
     
-    - name: Install additional LaTeX packages
-      run: |
-        # Check if packages are already installed
-        if ! tlmgr list --only-installed | grep -q "collection-fontsrecommended"; then
-          tlmgr install collection-fontsrecommended collection-latexextra
-        else
-          echo "Additional packages already installed"
-        fi
+
     
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
