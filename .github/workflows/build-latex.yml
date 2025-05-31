@@ -61,8 +61,29 @@ jobs:
         run: bundle install
 
       - name: Build Jekyll site
-        working-directory: ${{ env.JEKYLL_ROOT }}
+        working-directory: ${{ env.JEKYLL_ROOT }} # This is 'docs'
         run: bundle exec jekyll build
+
+      # --- NEW DIAGNOSTIC STEPS ---
+      - name: Verify Jekyll _site directory contents
+        run: |
+          echo "--- Contents of the Jekyll root directory (${{ env.JEKYLL_ROOT }}/): ---"
+          ls -F ${{ env.JEKYLL_ROOT }}
+
+          echo "--- Contents of the Jekyll _site directory (${{ env.JEKYLL_ROOT }}/_site/): ---"
+          # This command will list contents if _site exists, or print an error if it doesn't
+          ls -F ${{ env.JEKYLL_ROOT }}/_site || echo "Error: ${{ env.JEKYLL_ROOT }}/_site directory not found or empty."
+
+          echo "--- Checking for Jekyll build errors (last 20 lines of build log): ---"
+          # This tries to capture recent build output from Jekyll for errors.
+          # Note: this might not capture all Jekyll errors if they happen earlier or are swallowed.
+          # For more verbose debugging, you could temporarily add --verbose to the jekyll build command.
+          tail -n 20 /tmp/jekyll_build.log || echo "No /tmp/jekyll_build.log found or file is smaller than 20 lines."
+        working-directory: ${{ github.workspace }} # Run from repository root to easily access docs/
+        # Make sure the 'Build Jekyll site' step pipes its output to a log file if you want to inspect it.
+        # For simplicity, we'll just check `ls` and rely on default error output for now.
+
+      # --- END NEW DIAGNOSTIC STEPS ---
 
       - name: Deploy Jekyll site to GitHub Pages
         if: github.ref == 'refs/heads/main'
