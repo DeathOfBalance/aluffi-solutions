@@ -1,94 +1,160 @@
-name: Build LaTeX PDF and Deploy Jekyll
+name: Build LaTeX and Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-      - actions
+    branches: [ main, claude ]
+  pull_request:
+    branches: [ main, claude ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: # <--- ADD THIS BLOCK
-      contents: write # Allows GITHUB_TOKEN to write to the repository
-      pages: write    # Allows GITHUB_TOKEN to deploy to GitHub Pages
-      id-token: write # Required for OpenID Connect authentication, good practice for Pages deployments
-
-    env:
-      TEX_ROOT: tex-source
-      JEKYLL_ROOT: docs
-      PDF_OUTPUT_NAME: aluffi-solutions-book.pdf
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Cache TeX Live
+      uses: actions/cache@v3
+      with:
+        path: /tmp/texlive
+        key: ${{ runner.os }}-texlive-full-${{ hashFiles('**/*.tex') }}
+        restore-keys: |
+          ${{ runner.os }}-texlive-full-
+          ${{ runner.os }}-texlive-
+    
+    - name: Install TeX Live
+      run: |
+        if [ ! -d "/tmp/texlive" ]; then
+          sudo apt-get update
+          sudo apt-get install -y wget perl-modules
+          cd /tmp
+          wget -qO- "https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz" | tar -xzf -
+          cd install-tl-*
+          echo "selected_scheme scheme-basic" > texlive.profile
+          echo "tlpdbopt_install_docfiles 0" >> texlive.profile
+          echo "tlpdbopt_install_srcfiles 0" >> texlive.profile
+          echo "TEXDIR /tmp/texlive" >> texlive.profile
+          echo "TEXMFLOCAL /tmp/texlive/texmf-local" >> texlive.profile
+          echo "TEXMFSYSCONFIG /tmp/texlive/texmf-config" >> texlive.profile
+          echo "TEXMFSYSVAR /tmp/texlive/texmf-var" >> texlive.profile
+          ./install-tl -profile texlive.profile
+        fi
+        echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
+    
+    - name: Install additional LaTeX packages
+      run: |
+        # Check if packages are already installed
+        if ! tlmgr list --only-installed | grep -q "collection-fontsrecommended"; then
+          tlmgr install collection-fontsrecommended collection-latexextra
+        else
+          echo "Additional packages already installed"
+        fi
+    
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+    
+    - name: Create Gemfile if it doesn't exist
+      run: |
+        if [ ! -f Gemfile ]; then
+          cat > Gemfile << EOF
+        source "https://rubygems.org"
+        gem "jekyll", "~> 4.3"
+        gem "webrick", "~> 1.7"
+        EOF
+        fi
+    
+    - name: Install Jekyll dependencies
+      run: bundle install
+    
+    - name: Build PDF from LaTeX
+      run: |
+        # Assuming your main LaTeX file is main.tex
+        # Adjust the filename as needed
+        if [ -f "main.tex" ]; then
+          pdflatex main.tex
+          pdflatex main.tex  # Run twice for references
+        elif [ -f "document.tex" ]; then
+          pdflatex document.tex
+          pdflatex document.tex
+        else
+          echo "No LaTeX file found. Please ensure you have a .tex file in your repository."
+          exit 1
+        fi
+        
+        # Move PDF to Jekyll assets directory
+        mkdir -p assets
+        mv *.pdf assets/ 2>/dev/null || true
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+    
+    - name: Create Jekyll site structure
+      run: |
+        # Create basic Jekyll structure if it doesn't exist
+        if [ ! -f "_config.yml" ]; then
+          cat > _config.yml << EOF
+        title: LaTeX Document Site
+        description: Auto-generated site with LaTeX PDF
+        baseurl: ""
+        url: "https://${{ github.repository_owner }}.github.io"
+        
+        markdown: kramdown
+        highlighter: rouge
+        theme: minima
+        
+        plugins:
+          - jekyll-feed
+        EOF
+        fi
+        
+        if [ ! -f "index.md" ]; then
+          cat > index.md << EOF
+        ---
+        layout: default
+        title: Home
+        ---
+        
+        # LaTeX Document
+        
+        Your PDF has been automatically generated and is available below:
+        
+        {% for file in site.static_files %}
+          {% if file.extname == '.pdf' %}
+        - [{{ file.name }}]({{ file.path }})
+          {% endif %}
+        {% endfor %}
+        
+        This site is automatically updated when changes are pushed to the repository.
+        EOF
+        fi
+    
+    - name: Build Jekyll site
+      run: bundle exec jekyll build
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
 
-      - name: Cache TinyTeX
-        uses: actions/cache@v3
-        with:
-          path: ~/.TinyTeX
-          key: texlive-${{ runner.os }}-v1
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
 
-      - name: Install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2
-
-      - name: Install required LaTeX packages
-        working-directory: ${{ env.TEX_ROOT }}
-        run: |
-            xargs tlmgr install < latex_packages.txt
-
-
-      - name: Compile LaTeX document with latexmk
-        working-directory: ${{ env.TEX_ROOT }}
-        run: |
-          mkdir -p ../generated-pdfs
-          latexmk -pdf -interaction=nonstopmode -outdir=build main.tex
-          mv build/main.pdf ../generated-pdfs/${{ env.PDF_OUTPUT_NAME }}
-          latexmk -c -outdir=build main.tex
-
-      - name: Copy generated PDF to Jekyll assets
-        run: |
-          mkdir -p ${{ env.JEKYLL_ROOT }}/assets/solutions
-          cp generated-pdfs/${{ env.PDF_OUTPUT_NAME }} ${{ env.JEKYLL_ROOT }}/assets/solutions/
-
-      - name: Setup Ruby for Jekyll
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-          bundler-cache: true
-
-      - name: Install Jekyll dependencies
-        working-directory: ${{ env.JEKYLL_ROOT }}
-        run: bundle install
-
-      - name: Build Jekyll site
-        working-directory: ${{ env.JEKYLL_ROOT }} # This is 'docs'
-        run: bundle exec jekyll build
-
-      # --- NEW DIAGNOSTIC STEPS ---
-      - name: Verify Jekyll _site directory contents
-        run: |
-          echo "--- Contents of the Jekyll root directory (${{ env.JEKYLL_ROOT }}/): ---"
-          ls -F ${{ env.JEKYLL_ROOT }}
-
-          echo "--- Contents of the Jekyll _site directory (${{ env.JEKYLL_ROOT }}/_site/): ---"
-          # This command will list contents if _site exists, or print an error if it doesn't
-          ls -F ${{ env.JEKYLL_ROOT }}/_site || echo "Error: ${{ env.JEKYLL_ROOT }}/_site directory not found or empty."
-
-          echo "--- Checking for Jekyll build errors (last 20 lines of build log): ---"
-          # This tries to capture recent build output from Jekyll for errors.
-          # Note: this might not capture all Jekyll errors if they happen earlier or are swallowed.
-          # For more verbose debugging, you could temporarily add --verbose to the jekyll build command.
-          tail -n 20 /tmp/jekyll_build.log || echo "No /tmp/jekyll_build.log found or file is smaller than 20 lines."
-        working-directory: ${{ github.workspace }} # Run from repository root to easily access docs/
-        # Make sure the 'Build Jekyll site' step pipes its output to a log file if you want to inspect it.
-        # For simplicity, we'll just check `ls` and rely on default error output for now.
-
-      # --- END NEW DIAGNOSTIC STEPS ---
-
-      - name: Deploy Jekyll site to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ env.JEKYLL_ROOT }}/_site
