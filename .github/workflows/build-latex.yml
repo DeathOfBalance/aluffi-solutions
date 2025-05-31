@@ -27,7 +27,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/texlive-cache
-        key: ${{ runner.os }}-latex-packages-v3
+        key: ${{ runner.os }}-latex-packages-v4
         restore-keys: |
           ${{ runner.os }}-latex-packages-
     
@@ -39,7 +39,7 @@ jobs:
         else
           echo "Installing LaTeX packages..."
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-recommended texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra
           # Mark as installed for caching
           mkdir -p ~/texlive-cache
           touch ~/texlive-cache/.installed
