@@ -29,21 +29,29 @@ jobs:
       # Use tlmgr (TeX Live Manager) to install specific packages
       # This step must come AFTER 'Set up TinyTeX'
       run: |
+        echo "Updating tlmgr itself..."
+        tlmgr update --self || echo "tlmgr self-update failed, continuing anyway..." # Update tlmgr itself first
+
+        echo "Installing core LaTeX collections and latexmk..."
+        # Install latexmk separately as it's a tool, not necessarily part of collections
         tlmgr install latexmk
+
+        # These collections should contain amsmath, amssymb, amsthm, and many other common packages
         tlmgr install collection-fontsrecommended
         tlmgr install collection-latexrecommended
-        tlmgr install amsmath
-        tlmgr install amssymb
-        tlmgr install amsthm
-        # Add any other specific packages your LaTeX source uses here, for example:
+        # If your document specifically requires other packages not covered by these collections,
+        # list them individually here:
         # tlmgr install graphicx
-        # tlmgr install hyperref
+        # tlmmgr install hyperref
         # tlmgr install caption
         # tlmgr install geometry
         # tlmgr install tikz
-        # IMPORTANT: Run 'tlmgr update --all' occasionally if you have issues,
-        # but typically installing specific packages is enough for CI/CD.
-    # === END OF CORRECTED TeX LIVE SETUP ===
+        
+        # Optional: You can run a full update of all installed packages, but it can be slow
+        # echo "Updating all installed LaTeX packages (optional, can be slow)..."
+        # tlmgr update --all || echo "tlmgr update --all failed, continuing anyway..."
+        
+        echo "LaTeX package installation complete."
 
     - name: Create directory for generated PDFs
       # Creates the folder where the compiled PDF will temporarily reside
