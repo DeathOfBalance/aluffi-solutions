@@ -47,16 +47,18 @@ jobs:
             texlive-fonts-extra \
             fonts-lmodern 
           
-          # Update TeX Live's file database
-          sudo mktexlsr # <--- ADD THIS LINE
-          
-          # Update TeX Live's font maps after installing lmodern
-          sudo updmap-sys --force --enable Map lmodern.map
-          
           # Mark as installed for caching
           mkdir -p ~/texlive-cache
           touch ~/texlive-cache/.installed
         fi
+        
+        # --- Crucial change: These commands are now outside the caching check ---
+        # Update TeX Live's file database (always run)
+        sudo mktexlsr 
+        
+        # Update TeX Live's font maps (always run)
+        sudo updmap-sys --force --enable Map lmodern.map
+        # --- End of crucial change ---
     
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
@@ -104,7 +106,6 @@ jobs:
         fi
         
         # Move PDF to Jekyll assets directory (back to root level)
-        cd <<EOF
         cd ..
         mkdir -p assets
         mv tex-source/*.pdf assets/ 2>/dev/null || true
