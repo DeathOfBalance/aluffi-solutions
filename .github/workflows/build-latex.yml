@@ -33,6 +33,7 @@ jobs:
         uses: r-lib/actions/setup-tinytex@v2
 
       - name: Install required LaTeX packages
+        working-directory: ${{ env.TEX_ROOT }}
         run: |
             xargs tlmgr install < latex_packages.txt
 
