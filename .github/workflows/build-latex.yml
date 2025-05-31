@@ -54,12 +54,22 @@ jobs:
         if: steps.tinytex-cache-restore.outputs.cache-hit != 'true'
         run: |
           echo "Cache miss detected. Installing TinyTeX and packages from scratch."
+          # Install base TinyTeX
           curl -sL "https://yihui.org/tinytex/install-bin-unix.sh" | sh
 
-          # Add TinyTeX to PATH for this run (CORRECTED LINE BELOW)
-          export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
-          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')" >> $GITHUB_PATH # CORRECTED LINE BELOW
+          # Explicitly define TinyTeX's binary directory using $HOME
+          # The 'uname -s | tr' command correctly converts OS name (e.g., 'Linux' to 'linux')
+          TINYTEX_BIN_DIR="$HOME/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')"
+          
+          # Add TinyTeX to PATH for the REMAINDER of THIS script
+          export PATH="$TINYTEX_BIN_DIR:$PATH"
+          
+          # Also make it available for subsequent steps by writing to GITHUB_PATH
+          echo "$TINYTEX_BIN_DIR" >> $GITHUB_PATH
 
+          echo "DEBUG: PATH after TinyTeX install: $PATH" # For debugging
+
+          # Now tlmgr should be found and executable
           echo "Updating tlmgr itself..."
           tlmgr update --self || true
 
@@ -75,9 +85,16 @@ jobs:
         if: steps.tinytex-cache-restore.outputs.cache-hit == 'true'
         run: |
           echo "Cache hit detected. Ensuring TinyTeX is configured."
-          # Add TinyTeX to PATH for this run (CORRECTED LINE BELOW)
-          export PATH="~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]'):$PATH"
-          echo "~/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')" >> $GITHUB_PATH # CORRECTED LINE BELOW
+          # Explicitly define TinyTeX's binary directory using $HOME
+          TINYTEX_BIN_DIR="$HOME/.TinyTeX/bin/$(uname -s | tr '[:upper:]' '[:lower:]')"
+          
+          # Add TinyTeX to PATH for the REMAINDER of THIS script
+          export PATH="$TINYTEX_BIN_DIR:$PATH"
+          
+          # Also make it available for subsequent steps by writing to GITHUB_PATH
+          echo "$TINYTEX_BIN_DIR" >> $GITHUB_PATH
+
+          echo "DEBUG: PATH after TinyTeX configure: $PATH" # For debugging
 
           echo "Updating tlmgr itself..."
           tlmgr update --self || true
