@@ -25,12 +25,11 @@ jobs:
       id: tinytex-cache
       with:
         path: ~/.TinyTeX
-        # CORRECTED KEY LINE BELOW:
-        key: ${{ runner.os }}-tinytex-${{ hashFiles(format('{0}/{1}', env.TEX_ROOT, 'latex_packages.txt')) }}
-        # Alternatively, a simpler concatenation might also work, but 'format' is often clearer:
-        # key: ${{ runner.os }}-tinytex-${{ hashFiles(env.TEX_ROOT + '/latex_packages.txt') }}
+        # CORRECTED KEY LINE BELOW - use a direct string for hashFiles path:
+        key: ${{ runner.os }}-tinytex-${{ hashFiles('tex-source/latex_packages.txt') }}
         restore-keys: |
           ${{ runner.os }}-tinytex-
+
 
     - name: Check TinyTeX Cache Status (for debugging)
       # This step will tell us if the cache was hit or missed, and show the key.
