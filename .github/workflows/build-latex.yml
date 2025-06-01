@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - cache
 
 jobs:
   build:
@@ -26,7 +27,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.TinyTeX
-          key: texlive-${{ runner.os }}-v1
+          # Use a hash of the tlmgr install commands to bust the cache when packages change
+          key: texlive-${{ runner.os }}-${{ hashFiles('.github/workflows/main.yml') }}-v1
+          restore-keys: |
+            texlive-${{ runner.os }}-v1 # Fallback to a base TinyTeX cache if the specific package cache misses
 
       - name: Install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
