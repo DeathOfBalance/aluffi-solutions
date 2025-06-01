@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache TinyTeX
+        id: cache-tinytex # Add an ID to reference outputs
         uses: actions/cache@v3
         with:
           path: ~/.TinyTeX
@@ -31,36 +32,33 @@ jobs:
           restore-keys: |
             texlive-${{ runner.os }}-v1
 
-      - name: Install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2
-        # Add env var to see what setup-tinytex is doing
-        env:
-          TINYTEX_VERBOSE: "true" # Or any other verbose flag if the action supports it
-
-      - name: Verify TinyTeX installation state (Diagnostic)
+      # Conditionally install TinyTeX only if the cache did NOT hit
+      - name: Install TinyTeX (if not cached)
+        if: steps.cache-tinytex.outputs.cache-hit != 'true'
         run: |
-          echo "--- Disk usage of TinyTeX ---"
-          du -sh ~/.TinyTeX
-          echo "--- tlmgr version ---"
-          tlmgr --version
-          echo "--- List installed tlmgr packages (top few) ---"
-          # List some installed packages to see if they are there
-          tlmgr list --only-installed | head -n 20
-          echo "--- Check tlmgr path ---"
-          which tlmgr
-          echo "--- Check tlmgr configuration ---"
-          tlmgr option repository
-          tlmgr option auto-install
+          # Install TinyTeX directly, similar to what setup-tinytex does initially
+          wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+          # Ensure tlmgr self-updates to the latest version before installing packages
+          # This is important for stability and access to latest packages
+          echo "Updating tlmgr self..."
+          ~/.TinyTeX/bin/x86_64-linux/tlmgr update --self --force # --force can be useful for initial setup
+          echo "tlmgr updated to latest version."
+
+      # Always ensure TinyTeX is on PATH for subsequent steps
+      - name: Add TinyTeX to PATH
+        run: |
+          echo "PATH=$HOME/.TinyTeX/bin/x86_64-linux:$PATH" >> $GITHUB_ENV
+          # Optional: set MANPATH and INFOPATH if your LaTeX source depends on them
+          # echo "MANPATH=$HOME/.TinyTeX/texmf-dist/doc/man:$MANPATH" >> $GITHUB_ENV
+          # echo "INFOPATH=$HOME/.TinyTeX/texmf-dist/doc/info:$INFOPATH" >> $GITHUB_ENV
 
       - name: Install required LaTeX packages
         run: |
           echo "--- Running tlmgr install ---"
-          # Try to make tlmgr less verbose on updates/verifications if possible
-          # And avoid self-updates if they are not necessary on every run
+          # The --no-self-update is crucial here to prevent re-updates on cache hits
+          # --no-auto-install isn't needed as a direct option here.
           tlmgr install \
-            --no-self-update \ # Avoid tlmgr updating itself on every run
-            --no-auto-install \ # Ensure it only installs what's specified
-            --reinstall-forcibly-removed \ # Good for robustness, unlikely to affect speed on hits
+            --no-self-update \
             collection-fontsrecommended \
             collection-latexrecommended \
             latexmk \
@@ -69,6 +67,11 @@ jobs:
             lipsum \
             tcolorbox \
             xcolor
+
+      # Remove the problematic diagnostic step
+      # - name: Verify TinyTeX installation state (Diagnostic)
+      #   run: |
+      #     ... (removed for now, you can add specific lines back if needed later)
 
 
       - name: Compile LaTeX document with latexmk
