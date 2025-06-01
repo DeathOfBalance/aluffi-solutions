@@ -66,7 +66,7 @@ jobs:
             lipsum \
             tcolorbox \
             pdfcol \
-            mathrsfs
+            jknapltx rsfs
 
 
       - name: Compile LaTeX document with latexmk
