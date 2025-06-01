@@ -43,7 +43,8 @@ jobs:
             mathtools \
             enumitem \
             lipsum \
-            tcolorbox
+            tcolorbox \
+            pdfcol
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
