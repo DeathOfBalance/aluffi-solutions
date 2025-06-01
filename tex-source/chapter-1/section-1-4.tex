@@ -1,4 +1,22 @@
 \section{Morphisms}
 \begin{enumerate}
-    \item 
+    \item Composition is defined for \textit{two} morphisms. If more than two morphisms are given, e.g.,
+    \[ A \xrightarrow{f} B \xrightarrow{g} C \xrightarrow{h} D \xrightarrow{i} E, \]
+    then one may compose them in several ways, for example:
+    \[ (ih)(gf), \quad (i(hg))f, \quad i((hg)f), \quad \text{etc.} \]
+    so that at every step one is only composing two morphisms. Prove that the result of any such nested composition is independent of the placement of the parentheses. (Hint: Use induction on $n$ to show that any such choice for $f_n f_{n-1} \cdots f_1$ equals
+    \[ ((\cdots((f_n f_{n-1}) f_{n-2}) \cdots) f_1). \]
+    Carefully working out the case $n=5$ is helpful.) [\S4.1, \S II.1.3]
+
+\item In Example 3.3 we have seen how to construct a category from a set endowed with a relation, provided this latter is reflexive and transitive. For what types of relations is the corresponding category a groupoid (cf. Example 4.6)? [\S4.1]
+
+\item Let $A, B$ be objects of a category $\mathsf{C}$, and let $f \in \text{Hom}_{\mathsf{C}}(A, B)$ be a morphism.
+    \begin{itemize}
+        \item Prove that if $f$ has a right-inverse, then $f$ is an epimorphism.
+        \item Show that the converse does not hold, by giving an explicit example of a category and an epimorphism without a right-inverse.
+    \end{itemize}
+
+\item Prove that the composition of two monomorphisms is a monomorphism. Deduce that one can define a subcategory $\mathsf{C}_{\text{mono}}$ of a category $\mathsf{C}$ by taking the objects as in $\mathsf{C}$ and defining $\text{Hom}_{\mathsf{C}_{\text{mono}}}(A, B)$ to be the subset of $\text{Hom}_{\mathsf{C}}(A, B)$ consisting of monomorphisms, for all objects $A, B$. (Cf. Exercise 3.8; of course, in general $\mathsf{C}_{\text{mono}}$ is not full in $\mathsf{C}$.) Do the same for epimorphisms. Can you define a subcategory $\mathsf{C}_{\text{nonmono}}$ of $\mathsf{C}$ by restricting to morphisms that are \textit{not} monomorphisms?
+
+\item Give a concrete description of monomorphisms and epimorphisms in the category $\mathsf{MSet}$ you constructed in Exercise 3.9. (Your answer will depend on the notion of morphism you defined in that exercise!)
 \end{enumerate}
