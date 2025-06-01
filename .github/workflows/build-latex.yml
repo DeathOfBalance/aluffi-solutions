@@ -84,11 +84,28 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-          bundler-cache: true
+          # bundler-cache: true
+
+      # Cache Ruby Gems (Jekyll Dependencies)
+      - name: Cache Ruby Gems
+        id: cache-ruby-gems # Add an ID to reference outputs for conditional steps
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.JEKYLL_ROOT }}/vendor/bundle # Explicitly cache Bundler's local install dir
+          key: ${{ runner.os }}-ruby-${{ hashFiles(format('{0}/Gemfile.lock', env.JEKYLL_ROOT)) }}
+          restore-keys: |
+            ${{ runner.os }}-ruby-
 
       - name: Install Jekyll dependencies
         working-directory: ${{ env.JEKYLL_ROOT }}
-        run: bundle install
+        run: |
+          echo "--- Installing Jekyll dependencies ---"
+          # Install gems locally to vendor/bundle for better caching
+          bundle config set --local path vendor/bundle
+          # Install using bundle install
+          # If cache hit, this should be very fast.
+          # If cache miss, it will install all gems.
+          bundle install --jobs 4 --retry 3 # Add common optimization flags
 
       - name: Build Jekyll site
         working-directory: ${{ env.JEKYLL_ROOT }} # This is 'docs'
