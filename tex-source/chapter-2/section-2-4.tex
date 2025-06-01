@@ -1,4 +1,43 @@
 \section{Group homomorphisms}
 \begin{enumerate}
-    \item
+    \item Check that the function $\pi_m^n$ defined in \S4.1 is well-defined and makes the diagram commute. Verify that it is a group homomorphism. Why is the hypothesis $m \mid n$ necessary? [\S4.1]
+
+    \item Show that the homomorphism $\pi_4 \times \pi_4$: $C_4 \to C_2 \times C_2$ is not an isomorphism. In fact, is there any isomorphism $C_4 \to C_2 \times C_2$?
+
+    \item Prove that a group of order $n$ is isomorphic to $\mathbb{Z}/n\mathbb{Z}$ if and only if it contains an element of order $n$. [\S4.3]
+
+    \item Prove that no two of the groups $(\mathbb{Z}, +)$, $(\mathbb{Q}, +)$, $(\mathbb{R}, +)$ are isomorphic to one another. Can you decide whether $(\mathbb{R}, +)$, $(\mathbb{C}, +)$ are isomorphic to one another? (Cf. Exercise VI.1.1.)
+
+    \item Prove that the groups $(\mathbb{R} \setminus \{0\}, \cdot)$ and $(\mathbb{C} \setminus \{0\}, \cdot)$ are isomorphic.
+
+    \item We have seen that $(\mathbb{R}, +)$ and $(\mathbb{R}^{>0}, \cdot)$ are isomorphic (Example 4.4). Are the groups $(\mathbb{Q}, +)$ and $(\mathbb{Q}^{>0}, \cdot)$ isomorphic?
+
+    \item Let $G$ be a group. Prove that the function $G \to G$ defined by $g \mapsto g^{-1}$ is a homomorphism if and only if $G$ is abelian. Prove that $g \mapsto g^2$ is a homomorphism if and only if $G$ is abelian.
+
+    \item Let $G$ be a group, and let $g \in G$. Prove that the function $\gamma_g: G \to G$ defined by $(\forall a \in G): \gamma_g(a) = gag^{-1}$ is an automorphism of $G$. (The automorphisms $\gamma_g$ are called `inner' automorphisms of $G$.) Prove that the function $G \to \text{Aut}(G)$ defined by $g \mapsto \gamma_g$ is a homomorphism. Prove that this homomorphism is trivial if and only if $G$ is abelian. [6.7, 7.11, IV.1.5]
+
+    \item Prove that if $m, n$ are positive integers such that $\text{gcd}(m, n)=1$, then $C_{mn} \cong C_m \times C_n$. [\S4.3, 4.10, \S IV.6.1, V.6.8]
+
+    \item Let $p \ne q$ be odd prime integers; show that $(\mathbb{Z}/pq\mathbb{Z})^*$ is not cyclic. (Hint: Use Exercise 4.9 to compute the order $N$ of $(\mathbb{Z}/pq\mathbb{Z})^*$, and show that no element can have order $N$.) [\S4.3]
+
+    \item In due time we will prove the easy fact that if $p$ is a prime integer, then the equation $x^d = 1$ can have at most $d$ solutions in $\mathbb{Z}/p\mathbb{Z}$. Assume this fact, and prove that the multiplicative group $G = (\mathbb{Z}/p\mathbb{Z})^*$ is cyclic. (Hint: Let $g \in G$ be an element of maximal order; use Exercise 1.15 to show that $|h|$ divides $|g|$ for all $h \in G$. Therefore...) [\S4.3, 4.15, 4.16, \S IV.6.3]
+
+    \item Compute the order of $[9]^{31}$ in the group $(\mathbb{Z}/31\mathbb{Z})^*$.
+          \begin{itemize}
+              \item Does the equation $x^3 - 9 = 0$ have solutions in $\mathbb{Z}/31\mathbb{Z}$? (Hint: Plugging in all 31 elements of $\mathbb{Z}/31\mathbb{Z}$ is too laborious and will not teach you much. Instead, use the result of the first part: if $c$ is a solution of the equation, what can you say about $|c|$?) [VII.5.15]
+          \end{itemize}
+
+    \item Prove that $\text{Aut}_{\mathsf{Grp}}(\mathbb{Z}/2\mathbb{Z} \times \mathbb{Z}/2\mathbb{Z}) \cong S_3$. [IV.5.14]
+
+    \item Prove that the order of the group of automorphisms of a cyclic group $C_n$ is the number of positive integers $r \le n$ that are relatively prime to $n$. (This is called Euler's $\phi$-function; cf. Exercise 6.14.) [\S IV.1.4, IV.1.22, \S IV.2.5]
+
+    \item Compute the group of automorphisms of $(\mathbb{Z}, +)$. Prove that if $p$ is prime, then $\text{Aut}_{\mathsf{Grp}}(C_p) \cong C_{p-1}$. (Use Exercise 4.11.) [IV.5.12]
+
+    \item Prove Wilson's theorem: an integer $p > 1$ is prime if and only if
+          \[ (p-1)! \equiv -1 \pmod p. \]
+          (For one direction, use Exercises 1.8 and 4.11. For the other, assume $d$ is a proper divisor of $p$, and note that $d$ divides $(p-1)!$; therefore....) [IV.4.11]
+
+    \item For a few small (but not too small) primes $p$, find a generator of $(\mathbb{Z}/p\mathbb{Z})^*$.
+
+    \item Prove the second part of Proposition 4.8.
 \end{enumerate}

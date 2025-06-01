@@ -65,7 +65,8 @@ jobs:
             enumitem \
             lipsum \
             tcolorbox \
-            pdfcol
+            pdfcol \
+            mathrsfs
 
 
       - name: Compile LaTeX document with latexmk

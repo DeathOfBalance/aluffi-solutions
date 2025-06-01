@@ -1,4 +1,33 @@
+
+
+
+
 \section{Free groups}
 \begin{enumerate}
-    \item
+    \item Does the category $\mathscr{F}^A$ defined in \S5.2 have final objects? If so, what are they?
+
+    \item Since trivial groups $T$ are initial in $\mathsf{Grp}$, one may be led to think that $(e, T)$ should be initial in $\mathscr{F}^A$, for every $A$: $e$ would be defined by sending every element of $A$ to the (only) element in $T$; and for any other group $G$, there is a unique homomorphism $T \to G$. Explain why $(e, T)$ is not initial in $\mathscr{F}^A$ (unless $A = \emptyset$).
+
+    \item Use the universal property of free groups to prove that the map $j: A \to F(A)$ is injective, for all sets $A$. (Hint: It suffices to show that for every two elements $a, b$ of $A$ there is a group $G$ and a set-function $f: A \to G$ such that $f(a) \ne f(b)$. Why? How do you construct $f$ and $G$?) [III.6.3]
+
+    \item In the `concrete' construction of free groups, one can try to reduce words by performing cancellations in any order; the process of `elementary reductions' used in the text (that is, from left to right) is only one possibility. Prove that the result of iterating cancellations on a word is independent of the order in which the cancellations are performed. Deduce the associativity of the product in $F(A)$ from this. [\S5.3]
+
+    \item Verify explicitly that $H^{\oplus A}$ is a group.
+
+    \item Prove that the group $F(\{x, y\})$ (visualized in Example 5.3) is a coproduct $\mathbb{Z} \ast \mathbb{Z}$ of $\mathbb{Z}$ by itself in the category $\mathsf{Grp}$. (Hint: With due care, the universal property for one turns into the universal property for the other.) [\S3.4, 3.7, 5.7]
+
+    \item Extend the result of Exercise 5.6 to free groups $F(\{x_1, \dots, x_n\})$ and to free abelian groups $F^{\text{ab}}(\{x_1, \dots, x_n\})$. [\S5.4]
+
+    \item Still more generally, prove that $F(A \coprod B) = F(A) \ast F(B)$ and that $F^{\text{ab}}(A \coprod B) = F^{\text{ab}}(A) \oplus F^{\text{ab}}(B)$ for all sets $A, B$. (That is, the constructions $F, F^{\text{ab}}$ `preserve coproducts'.)
+
+    \item Let $G = \mathbb{Z}^{\oplus \mathbb{N}}$. Prove that $G \times G \cong G$.
+
+    \item Let $F = F^{\text{ab}}(A)$.
+          \begin{itemize}
+              \item Define an equivalence relation $\sim$ on $F$ by setting $f' \sim f$ if and only if $f - f' = 2g$ for some $g \in F$. Prove that $F/\sim$ is a finite set if and only if $A$ is finite, and in that case $|F/\sim| = 2^{|A|}$.
+              \item Assume $F^{\text{ab}}(B) \cong F^{\text{ab}}(A)$. If $A$ is finite, prove that $B$ is also, and that $A \cong B$ as sets. (This result holds for free groups as well, and without any finiteness hypothesis. See Exercises 7.13 and VI.1.20.)
+          \end{itemize}
+
+
+          [7.4, 7.13]
 \end{enumerate}
