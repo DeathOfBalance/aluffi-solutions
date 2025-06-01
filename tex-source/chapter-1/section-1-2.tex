@@ -9,15 +9,15 @@
     \item Prove that `isomorphism' is an equivalence relation (on any set of sets). [\S4.1]
 
     \item Formulate a notion of \textit{epimorphism}, in the style of the notion of \textit{monomorphism} seen in \S2.6, and prove a result analogous to Proposition 2.3, for epimorphisms and surjections. [\S2.6, \S4.2]
-    
-    \begin{solution}
-        The dual notion is as follows: an \textit{epimorphism} is a function $f: A \to B$ such that for any two functions $\alpha', \alpha'': B \to Z$, if $\alpha' \circ f = \alpha'' \circ f$, then $\alpha' = \alpha''$.
-        The result analogous to Proposition 2.3 is that $f: A \to B$ is an epimorphism if and only if it is surjective.
 
-        First assume that $f$ is surjective and $\alpha' \circ f = \alpha'' \circ f$. We must show that for any $b \in B$, $\alpha'(b) = \alpha''(b)$. By surjectivity there exists $a \in A$ such that $f(a) = b$. Then $\alpha'(b) = \alpha'(f(a)) = \alpha''(f(a)) = \alpha''(b)$.
+          \begin{solution}
+              The dual notion is as follows: an \textit{epimorphism} is a function $f: A \to B$ such that for any two functions $\alpha', \alpha'': B \to Z$, if $\alpha' \circ f = \alpha'' \circ f$, then $\alpha' = \alpha''$.
+              The result analogous to Proposition 2.3 is that $f: A \to B$ is an epimorphism if and only if it is surjective.
 
-        Conversely, assume that $f$ is \emph{not} surjective, so that $\im f$ is not the whole of $B$. Then we can define functions $\alpha',\alpha'': B \to \{0,1\}$ that agree on $\im f$ but differ on some $b \in B \setminus \im f$. Specifically, let $\alpha'(b) = 1$ and $\alpha''(b) = 0$, while $\alpha'$ and $\alpha''$ agree on all other points in $\im f$. Then $\alpha' \circ f = \alpha'' \circ f$, but $\alpha' \neq \alpha''$, showing that $f$ is not an epimorphism.
-    \end{solution}
+              First assume that $f$ is surjective and $\alpha' \circ f = \alpha'' \circ f$. We must show that for any $b \in B$, $\alpha'(b) = \alpha''(b)$. By surjectivity there exists $a \in A$ such that $f(a) = b$. Then $\alpha'(b) = \alpha'(f(a)) = \alpha''(f(a)) = \alpha''(b)$.
+
+              Conversely, assume that $f$ is \emph{not} surjective, so that $\im f$ is not the whole of $B$. Then we can define functions $\alpha',\alpha'': B \to \{0,1\}$ that agree on $\im f$ but differ on some $b \in B \setminus \im f$. Specifically, let $\alpha'(b) = 1$ and $\alpha''(b) = 0$, while $\alpha'$ and $\alpha''$ agree on all other points in $\im f$. Then $\alpha' \circ f = \alpha'' \circ f$, but $\alpha' \neq \alpha''$, showing that $f$ is not an epimorphism.
+          \end{solution}
 
     \item With notation as in Example 2.4, explain how any function $f: A \to B$ determines a section of $\pi_A$.
 
@@ -28,7 +28,10 @@
     \item Show that if $A' \cong A''$ and $B' \cong B''$, and further $A' \cap B' = \emptyset$ and $A'' \cap B'' = \emptyset$, then $A' \cup B' \cong A'' \cup B''$. Conclude that the operation $\text{II}B$ (as described in \S1.4) is well-defined up to isomorphism (cf. \S2.9). [\S2.9, 5.7]
 
     \item Show that if $A$ and $B$ are finite sets, then $|B^A| = |B|^{|A|}$. [\S2.1, 2.11, \S II.4.1]
-        For any $x\in A$, $f(x)$ has $|B|$ possible outputs. Thus, $|B^A|$=$|B|^{|A|}$
+
+          \begin{solution}
+              For any $x\in A$, $f(x)$ has $|B|$ possible outputs. Thus, $|B^A|$=$|B|^{|A|}$, by the fundamental principle of counting.
+          \end{solution}
 
     \item In view of Exercise 2.10, it is not unreasonable to use $2^A$ to denote the set of functions from an arbitrary set $A$ to a set with 2 elements (say $\{0,1\}$). Prove that there is a bijection between $2^A$ and the \textit{power set} of $A$ (cf. \S1.2). [\S1.2, III.2.3]
 
