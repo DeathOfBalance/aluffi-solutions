@@ -38,10 +38,10 @@ jobs:
         run: |
           # Install TinyTeX directly, similar to what setup-tinytex does initially
           wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
-          # Ensure tlmgr self-updates to the latest version before installing packages
-          # This is important for stability and access to latest packages
-          echo "Updating tlmgr self..."
-          ~/.TinyTeX/bin/x86_64-linux/tlmgr update --self --force # --force can be useful for initial setup
+          # It's still a good idea to ensure tlmgr itself is up-to-date
+          # We'll put this update here, which only runs on a cache miss (new install)
+          echo "Updating tlmgr self (only on initial install)..."
+          ~/.TinyTeX/bin/x86_64-linux/tlmgr update --self || true # Use || true to prevent crash if update fails for some reason
           echo "tlmgr updated to latest version."
 
       # Always ensure TinyTeX is on PATH for subsequent steps
@@ -55,10 +55,10 @@ jobs:
       - name: Install required LaTeX packages
         run: |
           echo "--- Running tlmgr install ---"
-          # The --no-self-update is crucial here to prevent re-updates on cache hits
-          # --no-auto-install isn't needed as a direct option here.
+          # Removed --no-self-update as it's not supported by your tlmgr version.
+          # tlmgr will perform its normal checks. On a cache hit, it should still be fast
+          # because packages are already there.
           tlmgr install \
-            --no-self-update \
             collection-fontsrecommended \
             collection-latexrecommended \
             latexmk \
@@ -67,11 +67,6 @@ jobs:
             lipsum \
             tcolorbox \
             xcolor
-
-      # Remove the problematic diagnostic step
-      # - name: Verify TinyTeX installation state (Diagnostic)
-      #   run: |
-      #     ... (removed for now, you can add specific lines back if needed later)
 
 
       - name: Compile LaTeX document with latexmk
