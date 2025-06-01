@@ -27,24 +27,49 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.TinyTeX
-          # Use a hash of the tlmgr install commands to bust the cache when packages change
           key: texlive-${{ runner.os }}-${{ hashFiles('.github/workflows/main.yml') }}-v1
           restore-keys: |
-            texlive-${{ runner.os }}-v1 # Fallback to a base TinyTeX cache if the specific package cache misses
+            texlive-${{ runner.os }}-v1
 
       - name: Install TinyTeX
         uses: r-lib/actions/setup-tinytex@v2
+        # Add env var to see what setup-tinytex is doing
+        env:
+          TINYTEX_VERBOSE: "true" # Or any other verbose flag if the action supports it
+
+      - name: Verify TinyTeX installation state (Diagnostic)
+        run: |
+          echo "--- Disk usage of TinyTeX ---"
+          du -sh ~/.TinyTeX
+          echo "--- tlmgr version ---"
+          tlmgr --version
+          echo "--- List installed tlmgr packages (top few) ---"
+          # List some installed packages to see if they are there
+          tlmgr list --only-installed | head -n 20
+          echo "--- Check tlmgr path ---"
+          which tlmgr
+          echo "--- Check tlmgr configuration ---"
+          tlmgr option repository
+          tlmgr option auto-install
 
       - name: Install required LaTeX packages
         run: |
+          echo "--- Running tlmgr install ---"
+          # Try to make tlmgr less verbose on updates/verifications if possible
+          # And avoid self-updates if they are not necessary on every run
           tlmgr install \
+            --no-self-update \ # Avoid tlmgr updating itself on every run
+            --no-auto-install \ # Ensure it only installs what's specified
+            --reinstall-forcibly-removed \ # Good for robustness, unlikely to affect speed on hits
             collection-fontsrecommended \
             collection-latexrecommended \
+            latexmk \
             mathtools \
             enumitem \
             lipsum \
             tcolorbox \
-            pdfcol
+            xcolor
+
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
