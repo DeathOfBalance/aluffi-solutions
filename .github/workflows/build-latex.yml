@@ -36,12 +36,10 @@ jobs:
           tlmgr install \
             collection-fontsrecommended \
             collection-latexrecommended \
-            latexmk \
             mathtools \
             enumitem \
             lipsum \
-            tcolorbox \
-            xcolor
+            tcolorbox
 
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}

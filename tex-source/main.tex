@@ -30,6 +30,7 @@
 \usepackage{geometry}
 \usepackage{lipsum}
 \usepackage{tcolorbox}
+\tcbuselibrary{listings,breakable}
 \usepackage{xcolor} % Make sure xcolor is loaded for color definitions
 
 \usepackage{graphicx}
@@ -46,20 +47,31 @@
     pdfkeywords={Math, Solutions, Textbook, LaTeX}
 ]{hyperref}
 
-\newtcolorbox{solution}{
-  colback=gray!10, % Light grey background (adjust the percentage for darker/lighter)
-  colframe=gray!50, % Optional: darker grey frame
-  boxrule=0.5pt, % Optional: adjust frame thickness
-  arc=4pt, % Optional: rounded corners
-  left=5pt, right=5pt, top=5pt, bottom=5pt % Adjust internal padding
+% Define a tcolorbox style named 'mysolutionbox' with only necessary options
+\tcbset{
+  mysolutionbox/.style={
+    colback=gray!10, % Light grey background
+    colframe=gray!50, % Optional: darker grey frame
+    boxrule=0.5pt, % Optional: adjust frame thickness
+    arc=4pt, % Optional: rounded corners
+    left=5pt, right=5pt, top=5pt, bottom=5pt, % Adjust internal padding
+    % Explicitly set paragraph spacing and remove indent
+    before upper={%
+      \setlength{\parskip}{0.6\baselineskip}% % Set specific spacing
+      \setlength{\parindent}{0pt}% % No indent
+      % \everypar{\relax}% % Keep this in for robustness, but try without it first
+    },
+    breakable, % Allow the box to break across pages
+    % NO TITLE-RELATED OPTIONS HERE
+  }
 }
 
-% Re-define the solution environment to include the bold "Solution:" title
-\renewenvironment{solution}{
-  \begin{tcolorbox}
-    \textbf{Solution:}\quad
+% Define the solution environment using the 'mysolutionbox' style
+\newenvironment{solution}{
+  \begin{tcolorbox}[mysolutionbox] % Apply the defined style here
+    \textbf{Solution:}\quad % Manually add the title here, outside of tcolorbox options
 }{
-    \hfill$\square$\par\vspace{1ex}
+  \hfill$\square$\par\vspace{1ex} % Square at the end
   \end{tcolorbox}
 }
 
@@ -79,6 +91,9 @@
 
 % --- Begin Document ---
 \begin{document}
+
+% --- Custom commands ---
+\newcommand{\im}{\operatorname{im}}
 
 % Title page
 \maketitle
