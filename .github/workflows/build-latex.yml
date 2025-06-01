@@ -38,7 +38,11 @@ jobs:
             collection-latexrecommended \
             latexmk \
             mathtools \
-            enumitem
+            enumitem \
+            lipsum \
+            tcolorbox \
+            xcolor
+
       - name: Compile LaTeX document with latexmk
         working-directory: ${{ env.TEX_ROOT }}
         run: |
