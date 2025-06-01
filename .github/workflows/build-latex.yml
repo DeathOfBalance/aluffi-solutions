@@ -61,12 +61,10 @@ jobs:
           tlmgr install \
             collection-fontsrecommended \
             collection-latexrecommended \
-            latexmk \
             mathtools \
             enumitem \
             lipsum \
             tcolorbox \
-            xcolor \
             pdfcol
 
 
