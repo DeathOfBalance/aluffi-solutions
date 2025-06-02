@@ -36,6 +36,7 @@
 \usepackage{graphicx}
 \graphicspath{{assets/}} % Path to global image assets
 \usepackage{mathrsfs} % Add this line to your preamble for \mathscr support; tlmgr install jknapltx rsfs server-side
+\usepackage{etoolbox}
 
 \usepackage[
     colorlinks=true,
@@ -47,34 +48,45 @@
     pdfsubject={Mathematics Solutions},
     pdfkeywords={Math, Solutions, Textbook, LaTeX}
 ]{hyperref}
-
-% Define a tcolorbox style named 'mysolutionbox' with only necessary options
 \tcbset{
   mysolutionbox/.style={
-    colback=gray!10, % Light grey background
-    colframe=gray!50, % Optional: darker grey frame
-    boxrule=0.5pt, % Optional: adjust frame thickness
-    arc=4pt, % Optional: rounded corners
-    left=5pt, right=5pt, top=5pt, bottom=5pt, % Adjust internal padding
-    % Explicitly set paragraph spacing and remove indent
-    before upper={%
-      \setlength{\parskip}{0.6\baselineskip}% % Set specific spacing
-      \setlength{\parindent}{0pt}% % No indent
-      % \everypar{\relax}% % Keep this in for robustness, but try without it first
+    coltitle=black,
+    colback=gray!10,
+    colframe=gray!30,
+    boxrule=0.5pt,
+    arc=4pt,
+    left=5pt,
+    right=5pt,
+    top=5pt,
+    bottom=3pt,
+    breakable,
+    title={Solution},
+    fonttitle=\bfseries,
+    % after upper={\par\hfill\qedsymbol\par}, % <-- Removed the square
+    before upper={
+      \setlength{\parskip}{0.6\baselineskip}
+      \setlength{\parindent}{0pt}
+      \setlist{
+        nosep,
+        leftmargin=1.5em
+      }
     },
-    breakable, % Allow the box to break across pages
-    % NO TITLE-RELATED OPTIONS HERE
+    after={
+      \parskip=0pt
+      \parindent=0pt
+      \parskip=0pt
+      \parindent=1em
+    }
   }
 }
 
-% Define the solution environment using the 'mysolutionbox' style
+% Now, the 'solution' environment is much simpler, just invoking tcolorbox
 \newenvironment{solution}{
-  \begin{tcolorbox}[mysolutionbox] % Apply the defined style here
-    \textbf{Solution:}\quad % Manually add the title here, outside of tcolorbox options
+  \begin{tcolorbox}[mysolutionbox]
 }{
-  \hfill$\square$\par\vspace{1ex} % Square at the end
   \end{tcolorbox}
 }
+
 
 % Custom theorem/solution environments
 \newtheorem{theorem}{Theorem}[section]
@@ -95,6 +107,8 @@
 
 % --- Custom commands ---
 \newcommand{\im}{\operatorname{im}}
+\renewcommand{\hom}{\operatorname{Hom}}
+% \newcommand{\hom}{\operatorname{Hom}}
 
 % Title page
 \maketitle
