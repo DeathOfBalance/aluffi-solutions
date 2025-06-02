@@ -1,6 +1,15 @@
 \section{Definition of group}
 \begin{enumerate}
     \item Write a careful proof that every group is the group of isomorphisms of a groupoid. In particular, every group is the group of automorphisms of some object in some category. [\S2.1]
+    
+    \begin{solution}
+        Let $G$ be a group. The corresponding category $\mathsf{G}$ consists of a single element $*$, and we define $\hom_\mathsf{G}(*,*) = G$. The composition of morphisms is given by the group operation, and the identity morphism is the identity element of $G$. This really is a category since:
+        \begin{itemize}
+            \item The composition of morphisms is associative, since the operation of $G$ is associative.
+            \item The identity morphism is the identity element of $G$, which acts as the identity for composition.
+        \end{itemize}
+        In fact this is even a groupoid, since every morphism is invertible (again by definition of a group). Finally, what are the isomorphisms of this groupoid $\mathsf{G}$? They are precisely the morphisms $\hom_\mathsf{G}(*,*)$, which is $G$ itself. Thus, every group is indeed the group of isomorphisms of a groupoid.
+    \end{solution}
 
     \item Consider the `sets of numbers' listed in \S1.1, and decide which are made into groups by conventional operations such as $+$ and $\cdot$. Even if the answer is negative (for example, $(\mathbb{R}, \cdot)$ is not a group), see if variations on the definition of these sets lead to groups (for example, $(\mathbb{R}^*,\cdot)$ is a group; cf. \S1.4). [\S1.2]
 
