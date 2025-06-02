@@ -8,7 +8,7 @@
 
     \item The effect of the matrices
           \[ \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \]
-          on the plane is to respectively flip the plane about the $y$-axis and to rotate it $90^\circ$ clockwise about the origin. With this in mind, construct an action of $D_8$ on $\mathbb{R}^2$.
+          on the plane is to respectively flip the plane about the $x$-axis and to rotate it $90^\circ$ clockwise about the origin. With this in mind, construct an action of $D_8$ on $\mathbb{R}^2$.
 
     \item If $G = (G, \cdot)$ is a group, we can define an `opposite' group $G^\mathsf{o} = (G, \bullet)$ supported on the same set $G$, by prescribing
           \[ (\forall g, h \in G): g \bullet h = h \cdot g. \]
@@ -16,7 +16,7 @@
               \item Verify that $G^\mathsf{o}$ is indeed a group.
               \item Show that the `identity': $G^\mathsf{o} \to G, g \mapsto g$ is an isomorphism if and only if $G$ is commutative.
               \item Show that $G^\mathsf{o} \cong G$ (even if $G$ is not commutative!).
-              \item Show that giving a right-action of $G$ on a set $A$ is the same as giving a homomorphism $G^\mathsf{o} \to S_A$, that is, a left-action of $G^\mathsf{o}$ on $A$.
+              \item Show that giving a right-action of $G$ on a set $A$ is the same as giving a homomorphism $G^\mathsf{o} \to S_A$ (with the convention for $S_A$ adopted in this section, see the beginning of \S9.2), that is, a left-action of $G^\mathsf{o}$ on $A$.
               \item Show that the notions of left- and right-actions coincide `on the nose' for commutative groups. (That is, if $(g, a) \mapsto ga$ defines a right-action of a commutative group $G$ on a set $A$, then setting $ga = ag$ defines a left-action).
               \item For any group $G$, explain how to turn a right-action of $G$ into a left-action of $G$. (Note that the simple `flip' $ga = ag$ does not work in general if $G$ is not commutative.)
           \end{itemize}
@@ -42,8 +42,7 @@
               \item Show that $\text{Ker}\,\sigma \subseteq H$.
               \item Conclude that $H = \text{Ker}\,\sigma$, by index considerations.
           \end{itemize}
-
-    \item Thus $H$ is a kernel, proving that it is normal. (This exercise generalizes the result of Exercise 8.2.) [9.12]
+          Thus $H$ is a kernel, proving that it is normal. (This exercise generalizes the result of Exercise 8.2.) [9.12]
 
     \item Generalize the result of Exercise 9.11, as follows. Let $G$ be a group, and let $H \subseteq G$ be a subgroup of index $n$. Prove that $H$ contains a subgroup $K$ that is normal in $G$ and such that $[G: K]$ divides the gcd of $|G|$ and $n!$. (In particular, $[G: K] \le n!$.) [IV.2.23]
 

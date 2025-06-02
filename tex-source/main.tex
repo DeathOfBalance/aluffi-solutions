@@ -13,7 +13,7 @@
 
 % --- NEW: For enumerate numbering ---
 % This redefines the first level of enumeration to be SectionNumber.ItemNumber
-\renewcommand{\theenumi}{\thesection.\arabic{enumi}}
+\renewcommand{\theenumi}{\textbf{\thesection.\arabic{enumi}}}
 % This ensures the label uses the new numbering format
 \usepackage{enumitem} % Recommended package for list customization
 \setlist[enumerate,1]{label=\theenumi} % Apply the label format to the first level of enumerate
@@ -42,7 +42,7 @@
     linkcolor=blue,
     urlcolor=blue,
     citecolor=green,
-    pdftitle={Comprehensive Solutions to [Textbook Name]},
+    pdftitle={Algebra: Chapter 0 Solutions},
     pdfauthor={Your Name},
     pdfsubject={Mathematics Solutions},
     pdfkeywords={Math, Solutions, Textbook, LaTeX}
