@@ -11,7 +11,15 @@
     \item Give an example of a relation that is reflexive and symmetric but not transitive. What happens if you attempt to use this relation to define a partition on the set? (Hint: Thinking about the second question will help you answer the first one.)
     
     \begin{solution}
-        some nonsense
+        Consider, on the set
+        \[ S = \{1, \, 2, \, 3\} \]  
+        the relation
+        \[
+            R = \{(1, \, 1), \, (2, \, 2), \, (3, \, 3), \, (1, \, 2), \, (2, \, 1), \, (2, \, 3), \, (3, \, 2)\}.
+        \]
+        Note that while $R$ is obviously reflexive and symmetric, it is not transitive. (Since $1R2$ and $2R3$, but $1 \not{R} 3.$)
+
+        The 'equivalence classes' of $R$ are not disjoint, so a partition of $S$ is not possible.
     \end{solution}
 
     \item Define a relation $\sim$ on the set $\mathbb{R}$ of real numbers by setting $a \sim b \iff b-a \in \mathbb{Z}$. Prove that this is an equivalence relation, and find a `compelling' description for $\mathbb{R}/\sim$. Do the same for the relation $\approx$ on the plane $\mathbb{R} \times \mathbb{R}$ defined by declaring $(a_1, a_2) \approx (b_1, b_2) \iff b_1 - a_1 \in \mathbb{Z} \text{ and } b_2 - a_2 \in \mathbb{Z}$. [\S II.8.1, II.8.10]
