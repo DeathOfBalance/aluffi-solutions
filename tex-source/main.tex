@@ -37,6 +37,7 @@
 \graphicspath{{assets/}} % Path to global image assets
 \usepackage{mathrsfs} % Add this line to your preamble for \mathscr support; tlmgr install jknapltx rsfs server-side
 \usepackage{etoolbox}
+\usepackage{lipsum}
 
 \usepackage[
     colorlinks=true,
@@ -55,28 +56,26 @@
     colframe=gray!30,
     boxrule=0.5pt,
     arc=4pt,
-    left=5pt,
-    right=5pt,
-    top=5pt,
-    bottom=3pt,
+    left=5pt, right=5pt, top=5pt, bottom=3pt,
     breakable,
     title={Solution},
     fonttitle=\bfseries,
     % after upper={\par\hfill\qedsymbol\par}, % <-- Removed the square
     before upper={
-      \setlength{\parskip}{0.6\baselineskip}
+      \setlength{\parskip}{0.3\baselineskip}
       \setlength{\parindent}{0pt}
       \setlist{
         nosep,
-        leftmargin=1.5em
+        leftmargin=1.5em,
+        itemsep=0.15pt
       }
     },
-    after={
-      \parskip=0pt
-      \parindent=0pt
-      \parskip=0pt
-      \parindent=1em
-    }
+    % after={
+    %   \parskip=0pt
+    %   \parindent=0pt
+    %   \parskip=0pt
+    %   \parindent=1em
+    % }
   }
 }
 
