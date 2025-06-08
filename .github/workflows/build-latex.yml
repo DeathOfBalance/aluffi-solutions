@@ -69,7 +69,9 @@ jobs:
             jknapltx rsfs \
             cancel \
             todonotes \
-            quiver
+            quiver \
+            tikz \
+            pgf
 
 
       - name: Compile LaTeX document with latexmk
