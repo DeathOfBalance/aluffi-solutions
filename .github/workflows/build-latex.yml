@@ -70,7 +70,6 @@ jobs:
             cancel \
             todonotes \
             quiver \
-            tikz \
             pgf
 
 
