@@ -1,30 +1,78 @@
 \section{Universal properties}
 \begin{enumerate}
-    \item Prove that a final object in a category $\mathsf{C}$ is initial in the opposite category $\mathsf{C}^{\text{op}}$ (cf. Exercise 3.1).
-    \item Prove that $\emptyset$ is the unique initial object in $\mathsf{Set}$. [\S5.1]
-    \item Prove that final objects are unique up to isomorphism. [\S5.1]
-    \item What are initial and final objects in the category of `pointed sets' (Example 3.8)? Are they unique?
-    \item What are the final objects in the category considered in \S5.3? [\S5.3]
-    \item Consider the category corresponding to endowing (as in Example 3.3) the set $\mathbb{Z}^+$ of positive integers with the divisibility relation. Thus there is exactly one morphism $d \to m$ in this category if and only if $d$ divides $m$ without remainder; there is no morphism between $d$ and $m$ otherwise. Show that this category has products and coproducts. What are their `conventional' names? [\S VII.5.1]
-    \item Redo Exercise 2.9, this time using Proposition 5.4.
-    \item Show that in every category $\mathsf{C}$ the products $A \times B$ and $B \times A$ are isomorphic, if they exist. (Hint: Observe that they both satisfy the universal property for the product of $A$ and $B$; then use Proposition 5.4.)
-    \item Let $\mathsf{C}$ be a category with products. Find a reasonable candidate for the universal property that the product $A \times B \times C$ of three objects of $\mathsf{C}$ ought to satisfy, and prove that both $(A \times B) \times C$ and $A \times (B \times C)$ satisfy this universal property. Deduce that $(A \times B) \times C$ and $A \times (B \times C)$ are necessarily isomorphic.
-    \item Push the envelope a little further still, and define products and coproducts for \textit{families} (i.e., indexed sets) of objects of a category.
+      \item Prove that a final object in a category $\mathsf{C}$ is initial in the opposite category $\mathsf{C}^{\text{op}}$ (cf. Exercise 3.1).
+      \item Prove that $\emptyset$ is the unique initial object in $\mathsf{Set}$. [\S5.1]
+      \item Prove that final objects are unique up to isomorphism. [\S5.1]
+      \item What are initial and final objects in the category of `pointed sets' (Example 3.8)? Are they unique?
+            \begin{solution}
+                  The natural candidate in this case is the pair $(\{x\}, x)$, i.e., any singleton with its unique element as the base point. Given any pointed set $(S, s)$, there is a unique function $\{x\} \to S$ such that $x \mapsto s$, and a unique function $S \to \{x\}$ such that $s \mapsto x$. Hence $(\{x\}, x)$ is both initial and final in the category of pointed sets. In either case, it is unique up to unique isomorphism.
+            \end{solution}
+      \item What are the final objects in the category considered in \S5.3? [\S5.3]
+            \begin{solution}
+                  They are the functions $f:A \to \{x\}$ to any singleton. If $a'\sim a''$ then obviously $f(a') = f(a'')$, whence $f$ is an object in the given category. And it is a final object, since for any $\varphi:A \to Z$ there is a unique function $F: Z \to \{x\}$ such that $F\circ \varphi = f$ (this function maps everything to $x$).
+            \end{solution}
+      \item Consider the category corresponding to endowing (as in Example 3.3) the set $\mathbb{Z}^+$ of positive integers with the divisibility relation. Thus there is exactly one morphism $d \to m$ in this category if and only if $d$ divides $m$ without remainder; there is no morphism between $d$ and $m$ otherwise. Show that this category has products and coproducts. What are their `conventional' names? [\S VII.5.1]
+      \item Redo Exercise 2.9, this time using Proposition 5.4.
+            \begin{solution}
+                  Since we now know that the disjoint union is the coproduct in the category of sets, it immediately follows that it is well-defined up to isomorphism (as is any object defined by a universal property).
+            \end{solution}
+      \item Show that in every category $\mathsf{C}$ the products $A \times B$ and $B \times A$ are isomorphic, if they exist. (Hint: Observe that they both satisfy the universal property for the product of $A$ and $B$; then use Proposition 5.4.)
+      \item Let $\mathsf{C}$ be a category with products. Find a reasonable candidate for the universal property that the product $A \times B \times C$ of three objects of $\mathsf{C}$ ought to satisfy, and prove that both $(A \times B) \times C$ and $A \times (B \times C)$ satisfy this universal property. Deduce that $(A \times B) \times C$ and $A \times (B \times C)$ are necessarily isomorphic.
+      \item Push the envelope a little further still, and define products and coproducts for \textit{families} (i.e., indexed sets) of objects of a category.
 
-          Do these exist in $\mathsf{Set}$?
+            Do these exist in $\mathsf{Set}$?
 
-          It is common to denote the product $\underbrace{A \times \cdots \times A}_{n \text{ times}}$ by $A^n$.
+            It is common to denote the product $\underbrace{A \times \cdots \times A}_{n \text{ times}}$ by $A^n$.
 
-    \item Let $A$, resp. $B$ be a set, endowed with an equivalence relation $\sim_A$, resp. $\sim_B$. Define a relation $\sim$ on $A \times B$ by setting
-          \[ (a_1, b_1) \sim (a_2, b_2) \iff a_1 \sim_A a_2 \text{ and } b_1 \sim_B b_2. \]
-          (This is immediately seen to be an equivalence relation.)
-          \begin{itemize}
-            \item Use the universal property for quotients (\S5.3) to establish that there are canonical quotient maps $q_A : A \to A/{\sim_A}$, $q_B : B \to B/{\sim_B}$, and $q : A \times B \to (A \times B)/{\sim_{A \times B}}$, and that these induce functions $(A \times B)/{\sim_{A \times B}} \to A/{\sim_A}$ and $(A \times B)/{\sim_{A \times B}} \to B/{\sim_B}$.
-            \item Prove that $(A \times B)/{\sim_{A \times B}}$, together with these induced functions, satisfies the universal property for the product of $A/{\sim_A}$ and $B/{\sim_B}$.
-            \item Conclude (without further work) that $(A \times B)/{\sim_{A \times B}} \cong (A/{\sim_A}) \times (B/{\sim_B})$.
-          \end{itemize}
+      \item Let $A$, resp. $B$ be a set, endowed with an equivalence relation $\sim_A$, resp. $\sim_B$. Define a relation $\sim$ on $A \times B$ by setting
+            \[ (a_1, b_1) \sim (a_2, b_2) \iff a_1 \sim_A a_2 \text{ and } b_1 \sim_B b_2. \]
+            (This is immediately seen to be an equivalence relation.)
+            \begin{itemize}
+                  \item Use the universal property for quotients (\S5.3) to establish that there are canonical quotient maps $q_A : A \to A/{\sim_A}$, $q_B : B \to B/{\sim_B}$, and $q : A \times B \to (A \times B)/{\sim_{A \times B}}$, and that these induce functions $(A \times B)/{\sim_{A \times B}} \to A/{\sim_A}$ and $(A \times B)/{\sim_{A \times B}} \to B/{\sim_B}$.
+                  \item Prove that $(A \times B)/{\sim_{A \times B}}$, together with these induced functions, satisfies the universal property for the product of $A/{\sim_A}$ and $B/{\sim_B}$.
+                  \item Conclude (without further work) that $(A \times B)/{\sim_{A \times B}} \cong (A/{\sim_A}) \times (B/{\sim_B})$.
+            \end{itemize}
 
-    \item Define the notions of \textit{fibered products} and \textit{fibered coproducts}, as terminal objects of the categories $\mathsf{C}_{\alpha,\beta}$, $\mathsf{C}^{\alpha,\beta}$ considered in Example 3.10 (cf. also Exercise 3.11), by stating carefully the corresponding universal properties.
+      \item Define the notions of \textit{fibered products} and \textit{fibered coproducts}, as terminal objects of the categories $\mathsf{C}_{\alpha,\beta}$, $\mathsf{C}^{\alpha,\beta}$ considered in Example 3.10 (cf. also Exercise 3.11), by stating carefully the corresponding universal properties.
 
-          As it happens, $\mathsf{Set}$ has both fibered products and coproducts. Define these objects `concretely', in terms of naive set theory. [II.3.9, III.6.10, III.6.11]
+            As it happens, $\mathsf{Set}$ has both fibered products and coproducts. Define these objects `concretely', in terms of naive set theory. [II.3.9, III.6.10, III.6.11]
+
+            \begin{solution}
+                  Let us first define the fibered product $A \times_{C} B$ of two morphisms $\alpha:A \to C$, $\beta:B \to C$ as a final object in $\mathsf{C}_{\alpha,\beta}$. The universal property is as follows: for any object $(Z,f_A,f_B)$ in $\mathsf{C}_{\alpha,\beta}$, there exists a unique morphism $Z \to A \times_C B$ such that the following diagram commutes:
+
+                  % https://q.uiver.app/#q=WzAsNSxbMSwxLCJBXFx0aW1lc19DQiJdLFsyLDAsIkEiXSxbMiwyLCJCIl0sWzMsMSwiQyJdLFswLDEsIloiXSxbMCwxLCJcXHBpX0EiXSxbMCwyLCJcXHBpX0IiLDJdLFsxLDMsIlxcYWxwaGEiXSxbMiwzLCJcXGJldGEiLDJdLFs0LDEsImZfQSIsMCx7ImN1cnZlIjotMn1dLFs0LDIsImZfQiIsMix7ImN1cnZlIjoyfV0sWzQsMCwiXFxleGlzdHMhIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+                  \[\begin{tikzcd}
+                              && A \\
+                              Z & {A\times_CB} && C \\
+                              && B
+                              \arrow["\alpha", from=1-3, to=2-4]
+                              \arrow["{f_A}", curve={height=-12pt}, from=2-1, to=1-3]
+                              \arrow["{\exists!}", dashed, from=2-1, to=2-2]
+                              \arrow["{f_B}"', curve={height=12pt}, from=2-1, to=3-3]
+                              \arrow["{\pi_A}", from=2-2, to=1-3]
+                              \arrow["{\pi_B}"', from=2-2, to=3-3]
+                              \arrow["\beta"', from=3-3, to=2-4]
+                        \end{tikzcd}\]
+
+                  Note that since the fibered product comes equipped with projections to $A,B$, the universal property of the product yields a map $m:A\times_C B \to A\times B$ such that $\pi_A = p_A \circ m$, $\pi_B = p_B \circ m$, where $p_A$ and $p_B$ are the projections of the product. I claim that $m$ is \emph{monic}. Indeed, assume that $m \circ f_1 = m \circ f_2$ for some morphisms $f_1,f_2:Z \to A\times_C B$. Then, applying the product projections yields $\pi_A \circ f_1 = \pi_A \circ f_2$ (call this $f_A$) and $\pi_B \circ f_1 = \pi_B \circ f_2$ (call this $f_B$). By commutativity of the fibered product square we then have $\alpha \circ f_A = \beta \circ f_B$, so $f_1 = f_2$ by the uniqueness part of the universal property. Thus, $m$ is monic.
+
+                  Similarly, the commutative diagram for the fibered coproduct $A \sqcup_C B$ of two morphisms $\alpha:C \to A$, $\beta:C \to B$, as an initial object in the category $\mathsf{C}^{\alpha,\beta}$ is as follows (reverse all the arrows above):
+
+                  % https://q.uiver.app/#q=WzAsNSxbMiwxLCJBXFxzcWN1cF9DQiJdLFsxLDAsIkEiXSxbMSwyLCJCIl0sWzAsMSwiQyJdLFszLDEsIloiXSxbMSwwLCJpX0EiXSxbMiwwLCJpX0IiLDJdLFszLDEsIlxcYWxwaGEiXSxbMywyLCJcXGJldGEiLDJdLFsxLDQsImZfQSIsMCx7ImN1cnZlIjotMn1dLFsyLDQsImZfQiIsMix7ImN1cnZlIjoyfV0sWzAsNCwiXFxleGlzdHMhIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+                  \[\begin{tikzcd}
+                              & A \\
+                              C && {A\sqcup_CB} & Z \\
+                              & B
+                              \arrow["{i_A}", from=1-2, to=2-3]
+                              \arrow["{f_A}", curve={height=-12pt}, from=1-2, to=2-4]
+                              \arrow["\alpha", from=2-1, to=1-2]
+                              \arrow["\beta"', from=2-1, to=3-2]
+                              \arrow["{\exists!}", dashed, from=2-3, to=2-4]
+                              \arrow["{i_B}"', from=3-2, to=2-3]
+                              \arrow["{f_B}"', curve={height=12pt}, from=3-2, to=2-4]
+                        \end{tikzcd}\]
+                        In this case we get an epimorphism $p: A\sqcup B \to A\sqcup_C B$ instead.
+
+                  Specializing now to the category $\mathsf{Set}$, we can describe the fibered product and coproduct more concretely. The monomorphism and epimorphism above translate to $A \times_C B$ being a subset of $A \times B$, and $A \sqcup_C B$ being a quotient of $A \sqcup B$. Concretely, $A \times_C B = \{(a,b) \in A \times B \mid \alpha(a) = \beta(b)\}$, and $A \sqcup_C B$ is the set of equivalence classes of the relation $\sim$ on $A \sqcup B$ defined by $(a_1,b_1) \sim (a_2,b_2)$ if and only if $\alpha(a_1) = \beta(b_1)$ and $\alpha(a_2) = \beta(b_2)$.
+            \end{solution}
 \end{enumerate}

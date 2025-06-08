@@ -68,7 +68,8 @@ jobs:
             pdfcol \
             jknapltx rsfs \
             cancel \
-            todonotes
+            todonotes \
+            quiver
 
 
       - name: Compile LaTeX document with latexmk
