@@ -67,7 +67,8 @@ jobs:
             tcolorbox \
             pdfcol \
             jknapltx rsfs \
-            cancel
+            cancel \
+            todonotes
 
 
       - name: Compile LaTeX document with latexmk

@@ -1,6 +1,11 @@
 \section{Naive set theory}
 \begin{enumerate}
     \item Locate a discussion of Russell's paradox, and understand it.
+    \begin{solution}
+        Essentially, the principle of unrestricted comprehension must be rectified. Otherwise, you are quickly led to contradictions by being able to define sets like
+        \[R = \{ x \mid x \notin x\}.\]
+        Does $R$ contain itself?
+    \end{solution}
 
     \item Prove that if $\sim$ is an equivalence relation on a set $S$, then the corresponding family $\mathcal{P}_{\sim}$ defined in \S1.5 is indeed a partition of $S$: that is, its elements are nonempty, disjoint, and their union is $S$. [\S1.5]
     \begin{solution}
@@ -16,7 +21,8 @@
     \item How many different equivalence relations may be defined on the set $\{1, 2, 3\}$?
         \begin{solution}
                 Answer: 5
-                ${{1,2},{3}}$, ${{1}, {2}, {3}}$, ${{1,3},{2}}$, ${{1},{2,3}}$, ${1,2,3}$
+
+                                $\{\{1,2\},\{3\}\}$, $\{\{1\}, \{2\}, \{3\}\}$, $\{\{1,3\},\{2\}\}$, $\{\{1\},\{2,3\}\}$, $\{\{1,2,3\}\}$
         \end{solution}
     \item Give an example of a relation that is reflexive and symmetric but not transitive. What happens if you attempt to use this relation to define a partition on the set? (Hint: Thinking about the second question will help you answer the first one.)
     \begin{solution}
@@ -24,7 +30,7 @@
             Reflective, for any $a$ in $S$, $a$ is irrational. Thus, $2a$ must be irrational. 
             Symmetric, trivial. 
             Not transitive. $a\sim b$ and $a\sim c$. However, $b+c =0$ is a rational.
-    \end[solution]
+    \end{solution}
     \begin{solution}
         Consider, on the set
         \[ S = \{1, \, 2, \, 3\} \]  
@@ -38,8 +44,13 @@
     \end{solution}
 
     \item Define a relation $\sim$ on the set $\mathbb{R}$ of real numbers by setting $a \sim b \iff b-a \in \mathbb{Z}$. Prove that this is an equivalence relation, and find a `compelling' description for $\mathbb{R}/\sim$. Do the same for the relation $\approx$ on the plane $\mathbb{R} \times \mathbb{R}$ defined by declaring $(a_1, a_2) \approx (b_1, b_2) \iff b_1 - a_1 \in \mathbb{Z} \text{ and } b_2 - a_2 \in \mathbb{Z}$. [\S II.8.1, II.8.10]
-\end{enumerate}
+\todo{this isn't really a solution to the problem}
     \begin{solution}
         $\mathbb{R}/\sim ={[a]_{\sim}, a\in [0,1)}$
-        $\mathbb{R}^2/\sim = {([a]_{\sim},[b]_\{sim\}), (a,b)\in [0,1)^2}$
+        $\mathbb{R}^2/\sim = {([a]_{\sim},[b]_{\sim}), (a,b)\in [0,1)^2}$
+        
     \end{solution}
+    \begin{solution}
+        Hint: the first one is a circle, and the second one is a torus.
+    \end{solution}
+\end{enumerate}
