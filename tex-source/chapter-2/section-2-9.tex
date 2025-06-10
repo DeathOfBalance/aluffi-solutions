@@ -1,63 +1,72 @@
 \section{Group actions}
 \begin{enumerate}
-    \item (Once more, if you are already familiar with a little linear algebra...) The matrix groups listed in Exercise 6.1 all come with evident actions on a vector space: if $M$ is an $n \times n$ matrix with (say) real entries, multiplication to the right by a column $n$-vector $v$ returns a column $n$-vector $Mv$, and this defines a left-action on $\mathbb{R}^n$ viewed as the space of column $n$-vectors.
-          \begin{itemize}
-              \item Prove that, through this action, matrices $M \in \text{O}_n(\mathbb{R})$ preserve lengths and angles in $\mathbb{R}^n$.
-              \item Find an interesting action of $\text{SU}(2)$ on $\mathbb{R}^3$. (Hint: Exercise 8.9.)
-          \end{itemize}
+      \item (Once more, if you are already familiar with a little linear algebra...) The matrix groups listed in Exercise 6.1 all come with evident actions on a vector space: if $M$ is an $n \times n$ matrix with (say) real entries, multiplication to the right by a column $n$-vector $\mathbf{v}$ returns a column $n$-vector $M\mathbf{v}$, and this defines a left-action on $\mathbb{R}^n$ viewed as the space of column $n$-vectors.
+            \begin{itemize}
+                  \item Prove that, through this action, matrices $M \in \text{O}_n(\mathbb{R})$ preserve lengths and angles in $\mathbb{R}^n$.
+                  \item Find an interesting action of $\text{SU}(2)$ on $\mathbb{R}^3$. (Hint: Exercise 8.9.)
+            \end{itemize}
 
-    \item The effect of the matrices
-          \[ \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \]
-          on the plane is to respectively flip the plane about the $x$-axis and to rotate it $90^\circ$ clockwise about the origin. With this in mind, construct an action of $D_8$ on $\mathbb{R}^2$.
+      \item The effect of the matrices
+            \[ \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \]
+            on the plane is to respectively flip the plane about the $x$-axis and to rotate it $90^\circ$ clockwise about the origin. With this in mind, construct an action of $D_8$ on $\mathbb{R}^2$.
 
-    \item If $G = (G, \cdot)$ is a group, we can define an `opposite' group $G^\mathsf{o} = (G, \bullet)$ supported on the same set $G$, by prescribing
-          \[ (\forall g, h \in G): g \bullet h = h \cdot g. \]
-          \begin{itemize}
-              \item Verify that $G^\mathsf{o}$ is indeed a group.
-              \item Show that the `identity': $G^\mathsf{o} \to G, g \mapsto g$ is an isomorphism if and only if $G$ is commutative.
-              \item Show that $G^\mathsf{o} \cong G$ (even if $G$ is not commutative!).
-              \item Show that giving a right-action of $G$ on a set $A$ is the same as giving a homomorphism $G^\mathsf{o} \to S_A$ (with the convention for $S_A$ adopted in this section, see the beginning of \S9.2), that is, a left-action of $G^\mathsf{o}$ on $A$.
-              \item Show that the notions of left- and right-actions coincide `on the nose' for commutative groups. (That is, if $(g, a) \mapsto ga$ defines a right-action of a commutative group $G$ on a set $A$, then setting $ga = ag$ defines a left-action).
-              \item For any group $G$, explain how to turn a right-action of $G$ into a left-action of $G$. (Note that the simple `flip' $ga = ag$ does not work in general if $G$ is not commutative.)
-          \end{itemize}
+      \item If $G = (G, \cdot)$ is a group, we can define an `opposite' group $G^\mathsf{o} = (G, \bullet)$ supported on the same set $G$, by prescribing
+            \[ (\forall g, h \in G): g \bullet h := h \cdot g. \]
+            \begin{itemize}
+                  \item Verify that $G^\mathsf{o}$ is indeed a group.
+                  \item Show that the `identity': $G^\mathsf{o} \to G, g \mapsto g$ is an isomorphism if and only if $G$ is commutative.
+                  \item Show that $G^\mathsf{o} \cong G$ (even if $G$ is not commutative!).
+                  \item Show that giving a \emph{right}-action of $G$ on a set $A$ is the same as giving a homomorphism $G^\mathsf{o} \to S_A$ (with the convention for $S_A$ adopted in this section, see the beginning of \S9.2), that is, a \emph{left}-action of $G^\mathsf{o}$ on $A$.
+                  \item Show that the notions of left- and right-actions coincide `on the nose' for \emph{commutative} groups. (That is, if $(g, a) \mapsto ga$ defines a right-action of a commutative group $G$ on a set $A$, then setting $ga = ag$ defines a left-action).
+                  \item For any group $G$, explain how to turn a right-action of $G$ into a left-action of $G$. (Note that the simple `flip' $ga = ag$ does \emph{not} work in general if $G$ is not commutative.)
+            \end{itemize}
 
-    \item As mentioned in the text, right-multiplication defines a right-action of a group on itself. Find another natural right-action of a group on itself.
+      \item As mentioned in the text, \emph{right}-multiplication defines a right-action of a group on itself. Find \emph{another} natural right-action of a group on itself.
 
-    \item Prove that the action by left-multiplication of a group on itself is free.
+      \item Prove that the action by left-multiplication of a group on itself is free.
 
-    \item Let $O$ be an orbit of an action of a group $G$ on a set. Prove that the induced action of $G$ on $O$ is transitive.
+      \item Let $O$ be an orbit of an action of a group $G$ on a set. Prove that the induced action of $G$ on $O$ is transitive.
 
-    \item Prove that stabilizers are indeed subgroups.
+      \item Prove that stabilizers are indeed subgroups.
 
-    \item For $G$ a group, verify that $G$-$\mathsf{Set}$ is indeed a category, and verify that the isomorphisms in $G$-$\mathsf{Set}$ are precisely the equivariant bijections.
+      \item For $G$ a group, verify that $G$-$\mathsf{Set}$ is indeed a category, and verify that the isomorphisms in $G$-$\mathsf{Set}$ are precisely the equivariant bijections.
 
-    \item Prove that $G$-$\mathsf{Set}$ has products and coproducts and that every object of $G$-$\mathsf{Set}$ is a coproduct of objects of the type $G/H = \{\text{left-cosets of } H\}$, where $H$ is a subgroup of $G$ and $G$ acts on $G/H$ by left-multiplication.
+      \item Prove that $G$-$\mathsf{Set}$ has products and coproducts and that every object of $G$-$\mathsf{Set}$ is a coproduct of objects of the type $G/H = \{\text{left-cosets of } H\}$, where $H$ is a subgroup of $G$ and $G$ acts on $G/H$ by left-multiplication.
 
-    \item Let $H$ be any subgroup of a group $G$. Prove that there is a bijection between the set $G/H$ of left-cosets of $H$ and the set $H \backslash G$ of right-cosets of $H$ in $G$. (Hint: $G$ acts on the right on the set of right-cosets; use Exercise 9.3 and Proposition 9.9.)
+      \item Let $H$ be any subgroup of a group $G$. Prove that there is a bijection between the set $G/H$ of \emph{left}-cosets of $H$ and the set $H \backslash G$ of \emph{right}-cosets of $H$ in $G$. (Hint: $G$ acts on the right on the set of right-cosets; use Exercise 9.3 and Proposition 9.9.)
 
-    \item Let $G$ be a finite group, and let $H$ be a subgroup of index $p$, where $p$ is the smallest prime dividing $|G|$. Prove that $H$ is normal in $G$, as follows:
-          \begin{itemize}
-              \item Interpret the action of $G$ on $G/H$ by left-multiplication as a homomorphism $\sigma: G \to S_p$.
-              \item Then $\text{Ker}\,\sigma$ is (isomorphic to) a subgroup of $S_p$. What does this say about the index of $\text{Ker}\,\sigma$ in $G$?
-              \item Show that $\text{Ker}\,\sigma \subseteq H$.
-              \item Conclude that $H = \text{Ker}\,\sigma$, by index considerations.
-          \end{itemize}
-          Thus $H$ is a kernel, proving that it is normal. (This exercise generalizes the result of Exercise 8.2.) [9.12]
+      \item Let $G$ be a finite group, and let $H$ be a subgroup of index $p$, where $p$ is the \emph{smallest prime dividing} $|G|$. Prove that $H$ is normal in $G$, as follows:
+            \begin{itemize}
+                  \item Interpret the action of $G$ on $G/H$ by left-multiplication as a homomorphism $\sigma: G \to S_p$.
+                  \item Then $\ker\sigma$ is (isomorphic to) a subgroup of $S_p$. What does this say about the index of $\ker\sigma$ in $G$?
+                  \item Show that $\ker\sigma \subseteq H$.
+                  \item Conclude that $H = \ker\sigma$, by index considerations.
+            \end{itemize}
+            Thus $H$ is a kernel, proving that it is normal. (This exercise generalizes the result of Exercise 8.2.) [9.12]
 
-    \item Generalize the result of Exercise 9.11, as follows. Let $G$ be a group, and let $H \subseteq G$ be a subgroup of index $n$. Prove that $H$ contains a subgroup $K$ that is normal in $G$ and such that $[G: K]$ divides the gcd of $|G|$ and $n!$. (In particular, $[G: K] \le n!$.) [IV.2.23]
+      \item Generalize the result of Exercise 9.11, as follows. Let $G$ be a group, and let $H \subseteq G$ be a subgroup of index $n$. Prove that $H$ contains a subgroup $K$ that is normal in $G$ and such that $[G: K]$ divides the gcd of $|G|$ and $n!$. (In particular, $[G: K] \le n!$.) [IV.2.23]
 
-    \item Prove `by hand' that for all subgroups $H$ of a group $G$ and $\forall g \in G$, $G/H$ and $G/(gHg^{-1})$ (endowed with the action of $G$ by left-multiplication) are isomorphic in $G$-$\mathsf{Set}$. [\S9.3]
+      \item Prove `by hand' that for all subgroups $H$ of a group $G$ and $\forall g \in G$, $G/H$ and $G/(gHg^{-1})$ (endowed with the action of $G$ by left-multiplication) are isomorphic in $G$-$\mathsf{Set}$. [\S9.3]
 
-    \item Prove that the modular group $\text{PSL}_2(\mathbb{Z})$ is isomorphic to the coproduct $C_2 \ast C_3$. (Recall that the modular group $\text{PSL}_2(\mathbb{Z})$ is generated by $x = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$ and $y = \begin{pmatrix} 1 & 1 \\ 0 & 1 \end{pmatrix}$. Exercise 7.5). The task is to prove that $x$ and $y$ satisfy no other relation: this will show that $\text{PSL}_2(\mathbb{Z})$ is presented by $(x, y \mid x^2, y^3)$, and we have agreed that this is a presentation for $C_2 \ast C_3$ (Exercise 3.8 or 8.7). Reduce this to verifying that no products $(y^{\pm 1}x)(y^{\pm 1}x) \cdots (y^{\pm 1}x)$ or $(y^{\pm 1}x)(y^{\pm 1}x) \cdots (y^{\pm 1}x) y^{\pm 1}$ with one or more factors can equal the identity. This latter verification is traditionally carried out by cleverly exploiting an action\footnote{The modular group acts on $\mathbb{C} \cup \{\infty\}$ by Möbius transformations. The observation that it suffices to act on $\mathbb{R} \setminus \mathbb{Q}$ for the purpose of this verification is due to Roger Alperin.} on the set of irrational real numbers by
-          \[ \begin{pmatrix} a & b \\ c & d \end{pmatrix} r = \frac{ar+b}{cr+d} \]
-          Check that this does define an action of $\text{PSL}_2(\mathbb{Z})$, and note that
-          \[ y(r) = 1-\frac{1}{r}, \quad y^{-1}(r) = 1-\frac{1}{r'}, \quad yx(r) = 1+\frac{1}{r'}, \quad y^{-1}x(r) = \frac{1}{r} \]
+      \item Prove that the modular group $\psl_2(\mathbb{Z})$ is isomorphic to the coproduct $C_2 \ast C_3$.
+            (Recall that the modular group $\psl_2(\mathbb{Z})$ is generated by $x = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$ and $y = \begin{pmatrix} 1 & -1 \\ 1 & 0 \end{pmatrix}$, satisfying the relations $x^2 = y^3 = e$ in $\psl_2(\mathbb{Z})$ (Exercise 7.5). The task is to prove that $x$ and $y$ satisfy \emph{no} other relation: this will show that $\psl_2(\mathbb{Z})$ is presented by $(x, y \mid x^2, y^3)$, and we have agreed that this is a presentation for $C_2 \ast C_3$ (Exercise 3.8 or 8.7). Reduce this to verifying that no products
+            \[ (y^{\pm 1}x)(y^{\pm 1}x) \cdots (y^{\pm 1}x) \quad \text{or} \quad (y^{\pm 1}x)(y^{\pm 1}x) \cdots (y^{\pm 1}x) y^{\pm 1} \]
+            with one or more factors can equal the identity. This latter verification is traditionally carried out by cleverly exploiting an action\footnote{The modular group acts on $\mathbb{C} \cup \{\infty\}$ by \emph{Möbius transformations}. The observation that it suffices to act on $\mathbb{R} \setminus \mathbb{Q}$ for the purpose of this verification is due to Roger Alperin.} on the set of irrational real numbers by
+            \[ \begin{pmatrix} a & b \\ c & d \end{pmatrix} r = \frac{ar+b}{cr+d} \]
+            Check that this does define an action of $\psl_2(\mathbb{Z})$, and note that
+            \[ y(r) = 1-\frac{1}{r}, \quad
+                  y^{-1}(r) = \frac1{1-r}, \quad
+                  yx(r) = 1+r, \quad
+                  y^{-1}x(r) = \frac{r}{1+r}. \]
+            Now complete the verification with a case-by-case analysis. For example, a product $(y^{\pm 1}x)(y^{\pm 1}x) \cdots (y^{\pm 1}x)y$ cannot equal the identity in $\psl_2(\mathbb{Z})$ because if it did, it would act as the identity on $\mathbb{R} \setminus \mathbb{Q}$, while if $r < 0$, then $y(r) > 0$, and both $yx$ and $y^{-1}x$ send positive irrationals to positive irrationals.)
 
-    \item Prove that every (finitely generated) group $G$ acts freely on any corresponding Cayley graph. (Cf. Exercise 8.6. Actions on a directed graph are defined as actions on the set of vertices preserving incidence: if the vertices $v_1, v_2$ are connected by an edge, then so must be $gv_1, gv_2$ for every $g \in G$.) In particular, conclude that every free group acts freely on a tree. [9.16]
+      \item Prove that every (finitely generated) group $G$ acts freely on any corresponding Cayley graph. (Cf. Exercise 8.6. Actions on a directed graph are defined as actions on the set of vertices preserving incidence: if the vertices $v_1, v_2$ are connected by an edge, then so must be $gv_1, gv_2$ for every $g \in G$.) In particular, conclude that every free group acts freely on a tree. [9.16]
 
-    \item The converse of the last statement in Exercise 9.15 is also true: only free groups can act freely on a tree. Assuming this, prove that every subgroup of a free group (on a finite set) is free. [\S6.4]
+      \item The converse of the last statement in Exercise 9.15 is also true: only free groups can act freely on a tree. Assuming this, prove that every subgroup of a free group (on a finite set) is free. [\S6.4]
 
-    \item Consider $G$ as a $G$-set, by acting with left-multiplication. Prove that $\text{Aut}_{G\text{-}\mathsf{Set}}(G) \cong G$. [\S2.1]
+      \item {\tolerance=1000
+            Consider $G$ as a $G$-set, by acting with left-multiplication. Prove that $\text{Aut}_{G\text{-}\mathsf{Set}}(G) \cong G$. [\S2.1]
+            \par}
 
-    \item Show how to construct a groupoid carrying the information of the action of a group $G$ on a set $A$. (Hint: $A$ will be the set of objects of the groupoid. What will be the morphisms?)
+      \item Show how to construct a \emph{groupoid} carrying the information of the action of a group $G$ on a set $A$. (Hint: $A$ will be the set of objects of the groupoid. What will be the morphisms?)
 \end{enumerate}

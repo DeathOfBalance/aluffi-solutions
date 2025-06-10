@@ -1,7 +1,11 @@
 {
     "cSpell.words": [
+        "abelian",
         "coproduct",
+        "coproducts",
         "epimorphism",
+        "equivariant",
+        "groupoid",
         "monic",
         "monomorphism",
         "morphism",
@@ -10,5 +14,6 @@
         "multisets",
         "subobject",
         "subobjects"
-    ]
+    ],
+    "cSpell.enabled": true
 }
