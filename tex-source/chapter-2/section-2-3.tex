@@ -13,6 +13,9 @@
     \item Let $G, H$ be groups, and assume that $G \cong H \times G$. Can you conclude that $H$ is trivial? (Hint: No. Can you construct a counterexample?)
 
     \item Prove that $\mathbb{Q}$ is not the direct product of two nontrivial groups.
+    \begin{solution}
+      If $\mathbb{Q}$ were such a direct product, there would be a projection homomorphism $r:\mathbb{Q} \to Q$ onto a proper subgroup $Q$ such that $r(q) = q$ for all  $q \in Q$ (a so-called \emph{retraction}). I claim no such retraction exists. By the nature of rational numbers and subgroups, there exists some $\frac1p \notin Q$ and also some nonzero integer $n \in Q$. But then \[ np r\left(\frac1p\right) = r(n) = n \implies \frac1p = r\left(\frac1p\right) \in Q,\] a contradiction.
+    \end{solution}
 
     \item Consider the product of the cyclic groups $C_2, C_3$ (cf. \S2.3): $C_2 \times C_3$. By Exercise 3.3, this group is a coproduct of $C_2$ and $C_3$ in $\mathsf{Ab}$. Show that it is not a coproduct of $C_2$ and $C_3$ in $\mathsf{Grp}$, as follows:
           \begin{itemize}
