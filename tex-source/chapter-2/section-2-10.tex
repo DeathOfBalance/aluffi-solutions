@@ -7,8 +7,21 @@
     \item Show that \emph{groups}, as defined in \S1.2, are `group objects in the category of sets'. [\S10.1]
 
     \item Let $(G, \cdot)$ be a group, and suppose $\circ: G \times G \to G$ is a group homomorphism (w.r.t. $\cdot$) such that $(G, \circ)$ is \emph{also} a group. Prove that $\circ$ and $\cdot$ coincide. (Hint: First prove that the identity with respect to the two operations must be the same.)
+    \begin{solution}
+        Writing down the homomorphism condition explicitly, we see that \[ (gg')\circ(hh') = (g\circ h)(g' \circ h'). \]
+        Specializing to the case $g = h' = e_\circ$, $g'= h = e$, we immediately get $e_\circ = e$, i.e., both identities coincide. Then \[ gh = (g\circ e_\circ)(e_\circ \circ h) = (g e_\circ) \circ (e_\circ h) = (ge) \circ (eh) = g \circ h. \]
+    \end{solution}
 
     \item Prove that every \emph{abelian} group has exactly one structure of group object \emph{in the category} $\mathsf{Ab}$.
+    \begin{solution}
+            Let $G$ be an abelian group. It's an object of $\mathsf{Ab}$ and also a group, so it has the functions $m$, $e$, $\iota$ required by a group object. For these to be \emph{morphisms}, we must have, for all $g,h \in G$, $gh = hg$  (condition on $m$) and $h^{-1}g^{-1} = g^{-1}h^{-1}$ (condition on $\iota$). These are plainly \emph{equivalent} to the requirement that $G$ be abelian.
+
+            This shows that $G$ has at least one structure of group object. It is the only one, by Exercise 10.3.
+    \end{solution}
+
 
     \item By the previous exercise, a group object in $\mathsf{Ab}$ is nothing other than an abelian group. What is a group object in $\mathsf{Grp}$?
+    \begin{solution}
+        As in the previous exercise, we note that the condition that $m$ be a group homomorphism forces commutativity of the group operation. Hence, a group object in $\mathsf{Grp}$ is \emph{also} an abelian group.
+    \end{solution}
 \end{enumerate}
