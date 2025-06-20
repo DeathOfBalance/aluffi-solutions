@@ -39,6 +39,12 @@
       \twoheadrightarrow G
       \]
       for some $n$.
+\begin{solution}
+      Given such an epimorphism $f$, I claim that the images of the basis elements $e_i = (0,\ldots,1,\ldots,0)$ (with a unique 1 in the position $i$) under $f$ serve as a finite family of generators in $G$. Indeed, by surjectivity, every $g \in G$ corresponds an $n$-tuple $(a_1, \ldots, a_n) \in \mathbb{Z}^{\oplus n}$ such that $f(a_1, \ldots, a_n) = g$. But then \[ g = f(a_1, \ldots, a_n) = f\left(\sum_{i=1}^n a_i e_i\right) = \sum_{i=1}^n a_i f(e_i), \]
+which shows that the images $f(e_i)$ generate $G$.
+
+Conversely, if $G$ is finitely generated, then there are elements $g_1, \ldots, g_n \in G$ such that every $g \in G$ can be written as a finite sum of the form \[ g = a_1 g_1 + \cdots + a_n g_n \] for some integers $a_i$. Define the homomorphism $f: \mathbb{Z}^{\oplus n} \to G$ by sending the basis element $e_i$ to $g_i$ and using the universal property of free abelian groups. Then $f$ is surjective because every element of $G$ can be expressed in terms of the generators $g_i$.
+\end{solution}
 
     \item Prove that every finitely generated subgroup of $\mathbb{Q}$ is cyclic. Prove that $\mathbb{Q}$ is not finitely generated.
 
@@ -51,6 +57,11 @@
           Note that if $c$ and $d$ are both nonzero, one of these two operations may be used to decrease the absolute value of one of them. Argue that suitable applications of these operations reduce to the case in which $c=0$ or $d=0$. Prove directly that $m \in H$ in that case.) [7.5]
 
     \item Since direct sums are coproducts in $\mathsf{Ab}$, the classification theorem for abelian groups mentioned in the text says that every finitely generated abelian group is a coproduct of cyclic groups in $\mathsf{Ab}$. The reader is may be tempted to conjecture that every finitely generated group is a coproduct of cyclic groups in $\mathsf{Grp}$. Show that this is not the case, by proving that $S_3$ is not a coproduct of cyclic groups.
+    \begin{solution}
+      Since coproducts of nontrivial groups are infinite (as in Exercise 3.8), the only possibility is for one of the factors to be trivial, $S_3 \cong C_6$. But we already know that this is not the case, as $S_3$ is not cyclic.
+
+      % Alternatively, using the universal property, assume that $S_3$ is a coproduct $C_n \coprod C_m$ of cyclic groups. Then the canonical inclusions $C_n \hookrightarrow C_n \ast C_m$ and $C_m \hookrightarrow C_n \ast C_m$ would factor through a unique homomorphism $S_3 \to C_n \ast C_m$. Its image is a subgroup of $C_n \ast C_m$ of order 6, which is cyclic. But $S_3$ is not cyclic, so this is a contradiction.
+    \end{solution}
 
     \item Let $m, n$ be positive integers, and consider the subgroup $\langle m, n \rangle$ of $\mathbb{Z}$ they generate. By Proposition 6.9,
           \[ \langle m, n \rangle = d\mathbb{Z} \]

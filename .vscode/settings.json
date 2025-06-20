@@ -13,7 +13,8 @@
         "multiset",
         "multisets",
         "subobject",
-        "subobjects"
+        "subobjects",
+        "surjectivity"
     ],
     "cSpell.enabled": true
 }
